@@ -1,0 +1,1 @@
+find ./output/ -type f ! -name ".gitkeep" -exec rm {} \;

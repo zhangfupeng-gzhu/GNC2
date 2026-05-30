@@ -1,0 +1,5 @@
+1: >loadGNC
+2: >nohup mpirun -np 24 ini > logini.txt & 
+wait until it finished
+3: >nohup mpirun -np 24 main > logmainloop.txt &
+4: >event_analysis

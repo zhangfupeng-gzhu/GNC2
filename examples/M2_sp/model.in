@@ -1,0 +1,13 @@
+##================================================================
+#path respect to the root of GNC folder
+model_default_path= /source/main/model_default.in
+#
+mass unit =4e6
+mbh spin = 1
+GW outer orbit  =1
+--EMRI criteria  =0.001
+--output EMRI data bin =1
+set emax=1d6
+rmin rmax = 1d-6 1000
+chattery=0
+

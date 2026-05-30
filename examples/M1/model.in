@@ -1,0 +1,5 @@
+##================================================================
+#path respect to the root of GNC folder
+model_default_path= /source/main/model_default.in
+#
+

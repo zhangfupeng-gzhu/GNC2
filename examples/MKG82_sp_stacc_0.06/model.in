@@ -1,0 +1,23 @@
+##================================================================
+#path respect to GWPATH defined in ~/.bash_rc
+model_default_path = /source/main/model_default.in
+#
+mass unit           = 1e7 
+max timestep of snapshot = 200
+GW outer orbit      = 1
+--EMRI criteria     = 0.001
+--output EMRI data bin =1
+#
+mbh mass growth       = 1
+--initial gas reservoir = 0
+mbh mass = 0.001
+mbh spin = 1
+stellar evolution     = 1
+--fraction of mass loss to gas reservoir = 0.06
+clone scheme          = 1 
+--e0                         =  5
+--clone separation in energy = 8
+freq of data output = 1000
+fraction of timestep of snapshot =0.07
+rmin rmax = 1d-7 1000
+set emax=1d7

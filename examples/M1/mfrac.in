@@ -1,0 +1,27 @@
+#number of mass bin (given)  
+1  GIVEN  
+###########
+sg data mode = given
+model mode = SAME
+#first line: m1 mc m2 parameter_of_weighting_of_particles clone_factor
+#second line: star_fraction  sbh_fraction  ns_fraction wd_fraction bd_fraction, which is the fraction of components within each mass bin
+#``star'': MS stars
+#``sbh'': stellar black holes
+#``ns``: neutron stars
+#``wd``: white dwarfs
+#``bd``: brown dwarfs
+----------------------------------------------
+   1.00   1.00    1.00    100000 30
+   1.00   0.00    0.00    0.0  0.0  0.0   
+#---------------------------------------------- 
+# stars occupy 100%
+1    
+##########################################
+density model = Dehnen
+unit= MsunPc
+#mtot, in unit of msun
+mtot=4e7
+#ra, in unit of pc
+ra=2.17
+gamma=1.0
+----------------------------------------------

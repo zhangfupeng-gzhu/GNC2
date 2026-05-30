@@ -1,0 +1,74 @@
+GRID_TYPE discription:
+
+flag=0   sts_type_dstr
+
+|=x=|=x=|=x=|
+
+flag=1   sts_type_grid
+
+x=|=x=|=x=|=x  
+
+where x: the value of x(i);
+      |: separatrix, for data samples in that bin.
+
+
+Hiachy                   |||              name          |||               member      
+================================================================================================================================= =====================================================================================================================
+The basic type           |||    bin_function_type       |||        (m)xb    ---- x
+                                                        |||        (m)fx    ---- f(x)
+                                                        |||        (m)nbin  ---- num of x bin
+                                                        |||        (m)y2    ---- aux array for spline intepolation
+                                                        |||  (f)get_value_l ---- linear interpolate
+                                                        |||  (f)get_value_s ---- spline interpolate
+description: provide the basic functionality for a grided function  f(x)   
+======================================================================================================================================================================================================================================================
+The grid/distr  type     |||            s1d_type        |||   +(f)set_range ---- set ranges according to grid/distr bin
+                                                        |||        +(m)xmin ---- minimum value of the range 
+                                                        |||        +(m)xmax ---- maximum value of the range 
+                                                        |||       +(m)xstep ---- step of x 
+                                                        |||    +(m)bin_type ---- type of bins (grid or dstr)
+description: inherit from d2_type. Provide further functions for setting grid-type bins or distribution-type bins.
+======================================================================================================================================================================================================================================================
+The grid/distr  type     |||            s2d_type        |||    (m)xcenter   ---- x
+                                                        |||    (m)ycenter   ---- y
+                                                        |||    (m)fxy       ---- fxy
+                                                        |||    (m)nx        ---- num of x bin
+                                                        |||    (m)ny        ---- num of y bin
+                                                        |||    (m)bin_type  ---- type of bins (grid or dstr)
+                                                        |||    (f)set_range ---- set ranges according to grid/distr bin
+description: 
+======================================================================================================================================================================================================================================================
+histogram                |||         s1_hst_type        |||          +(m)nb ---- number of samples in that bin
+                                                        |||           (m)fx ---- distribution function (=nx/xstep)
+                                                        |||         +(m)ns  ---- total number of samples
+                                                        |||  +(m)use_weight ---- whether use weighting of samples
+                                                        |||         +(m)nbw ---- weighted number of samples in that bin
+                                                        |||         +(m)fxw ---- weighted distribution function (=nbw/xstep)
+                                                        |||         +(m)nsw ---- weighted total number of samples
+description: inherit from s1d_type, mainly calculate the distribution function of samples
+======================================================================================================================================================================================================================================================
+histogram                |||         s2_hst_type        |||     +(m)dx_proj ---- groups of sample projected in x-axis
+                                                        |||     +(m)dy_proj ---- groups of sample projected in y-axis
+                                                        |||     +(m)hst_x   ---- histogram projected in x-axis (not implimented yet)
+                                                        |||     +(m)hst_x   ---- histogram projected in x-axis (not implimented yet)
+                                                        |||      (m)fxy     ---- distribution function (=nxy/xstep/ystep)
+                                                        |||     +(m)nxy     ---- number of samples in each bin 
+                                                        |||  +(m)use_weight ---- whether use weighting of samples
+                                                        |||     +(m)nxyw    ---- weighted number of samples in each bin
+                                                        |||     +(m)fxyw    ---- weighted distribution function (=nxyw/xstep/ystep)
+                                                        |||     +(m)xmean   ---- mean value of (fxy,use_weight=0)/(fxyw, use_weight=1) in x-axis
+                                                        |||     +(m)ymean   ---- mean value of (fxy,use_weight=0)/(fxyw, use_weight=1) in y-axis
+                                                        |||     +(m)xsct    ---- scattering value of (fxy,use_weight=0)/(fxyw, use_weight=1) in x-axis
+                                                        |||     +(m)ysct    ---- scattering value of (fxy,use_weight=0)/(fxyw, use_weight=1) in y-axis
+                                                        |||        (m)y2    ---- aux array for spline-2d intepolation
+description: 2d-histogram, inherit from s2d_type
+======================================================================================================================================================================================================================================================
+Frequency                |||         s1_fc_type         |||        +(m)cnb  ---- cumulative number of samples in that bin
+                                                        |||        +(m)cfx  ---- cumulative normalized fraction
+                                                        |||         +(m)pn  ---- Possion noise associated in each bin
+                                                        |||          (m)fx  ---- frequency
+                                                        |||        +(m)cnbw ---- weighted cumulative number of samples in that bin
+                                                        |||          (m)fxw ---- weighted frequency
+                                                        |||        +(m)cfxw ---- weighted cumulative normalized fraction
+                                                        |||         +(m)pnw ---- weighted Possion noise associated in each bin
+description: inherit from sts_hst_type, mainly calculate the frequency function of samples

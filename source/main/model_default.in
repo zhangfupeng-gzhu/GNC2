@@ -1,0 +1,362 @@
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+####   Note: If primary parameters are changed, all the sub parameters need to specify explicitly
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+#######################Initial parameters#################################
+####   The initial distribution of angular momentum
+####   Can only be ``ISO'' 
+
+init type of f(j)   =ISO
+
+------------------------------------------------------------------
+####   Initially the cluster response adiabatically with growth of MBH mass (before the main run)
+
+init adiabatically response of mbh =0
+####   If >0, set the following parameter:
+####   The initial mass of MBH in log (in unit of M0)
+####   --init mbh log mass = -5
+####   The steps for the growth of MBH
+####   --n steps = 100
+####   The target mass of MBH in log (in unit of M0)
+####   --target mbh log mass = 1
+
+------------------------------------------------------------------
+####   The seed value of initial samples
+
+init random seed = 1
+
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+#######################Control parameters#################################
+
+####   Version of the code
+####   Controls the version of the code during reading and writting. 
+####   Only saved files matches version number can be read correctly
+version number = 107
+
+####   The unit of mass (msun)
+mass unit = 1e7
+
+------------------------------------------------------------------
+####   The initial mass of MBH in unit of ``mass unit''
+
+mbh mass = 1
+####   If mbh mass =0
+####   --replace sample exceed energy max = .false.
+
+------------------------------------------------------------------
+####   The spin of MBH
+
+mbh spin = 0
+
+------------------------------------------------------------------
+####   Whether the MBH mass is growing
+
+mbh mass growth  = 0
+####   If ``mbh mass growth=1'', need to specify the initial mass of the gas reservoir (msun)
+####   --initial gas reservoir=0
+
+####  Radiative efficiency
+####  it determine the Eddington ratio and the 
+####  fraction of mass to MBH = 1-radiative efficiency
+radiative efficiency=0.1
+
+------------------------------------------------------------------
+####   the method to get the bin size of energy
+####   can be ``IREG_P'' (use potential), ``IREG_J'' (use angular momentum)
+
+energy bin type      =IREG_J
+####   Set the minimum and maximum steps (-1 is automatic)
+--energy max min steps     =-1  -1
+
+------------------------------------------------------------------
+####   The way to evaluate the function of dimensionless g(x)
+####   can be ``GRID_2D'' 
+
+barg evaluate method =GRID_2D
+
+------------------------------------------------------------------
+####   the bin of diffusion coefficient now can only be ``IREG" (irregular)
+
+diffusion coefficient bin type =IREG
+
+------------------------------------------------------------------
+####   The method to calculate the integration of diffusion coefficients
+####   can be ``FAST" or ``GENERAL"
+
+diffusion coefficient integral method        =FAST
+
+------------------------------------------------------------------
+####   Using bins of (E,J) or (x,j) 
+
+energy and angular momentum in bins of = EJ
+
+------------------------------------------------------------------
+####   The bin type of angular momentum
+####   can be ``LOG'', ``LIN", or ``SQR"
+
+bin type of angular momentum   =LOG
+
+------------------------------------------------------------------
+####   The bin type of energy
+####   Can be ``LOG" or ``LIN"
+
+bin type of energy = LOG
+
+------------------------------------------------------------------
+####   The integral accuracy of diffusion coefficients (absolute, relative)
+
+diffusion coefficient integral acc  =1d-12 1d-8
+
+------------------------------------------------------------------
+####   The bin sizes of aux function
+
+aux bin sizes=200 80 80
+
+------------------------------------------------------------------
+####   The accuracy of integration: r functions (absolute, relative), period function (absolute, relative)
+
+func r and pd int acc =1d-25 1d-14 1d-12 1d-7
+
+------------------------------------------------------------------
+####   The method to evaluate adiabatic invariant
+####   can be ``FAST'', ``ACC"
+
+adiabatic invariant method  =FAST
+
+------------------------------------------------------------------
+####   The interpolate method of energy and J
+####   Can be ``Li2d" (2D Linear interpolation), or ``near'' (2D nearest interpolation)
+interpolate method of energy and J =li2d
+
+------------------------------------------------------------------
+####   Minimum and maximum value of dimensionless angular momentum=jmin jmax
+
+minimum and maximum Jdmless = 1d-5  0.9999999
+
+---------------------------------------------------------
+####   whether use exact method to evaluate the sample parameters (ra, rp, etc)
+
+all exact in sample para      =0
+
+---------------------------------------------------------
+####  alpha=stellar potential/MBH potential
+####  Below the value sample parameters are treated as Keplerian
+####  This value is not used if ``all exact = 1''
+
+alpha cri                    = 0.006
+
+---------------------------------------------------------
+####  Fine r_td range
+####  If pericenter r_p<r_td* (this value), then sample parameters are calculated accurately
+####  If pericenter r_p>r_td* (this value), then approximates are used (such as interpolation) for sample parameters
+
+fine rtd range          = 5
+
+------------------------------------------------------------------
+####   path to the stored table of relativistic loss cone, relative to $GWPATH
+
+relativistic loss cone table dir=/source/iso_table/iso_kerr
+
+------------------------------------------------------------------
+####   Minimum and maximum value of radial distance, in unit of (r0=3.1pc*(m0/4e6)**0.55)
+
+rmin rmax = 1d-6 1000
+
+------------------------------------------------------------------
+####   The maximum energy of particle
+
+set emax  =1d6
+
+---------------------------------------------------------
+####   number of dstr bins of f(r), f(e), f(j) and diffusion coefficients of (e,j)
+
+bin number of f(r) = 96
+bin number of f(e) = 96
+bin number of f(j) = 96
+bin number of dc(e,j)= 96
+
+---------------------------------------------------------
+####   The minimum number of samples in bins of mass
+####   If the number of samples is smaller than the set value, the mass bin will be 
+####   ignored during calculation
+
+minimum number of samples in mass bin = 40
+
+---------------------------------------------------------
+####  Whether turn on two body relaxation
+####  
+
+two body relaxation             =1
+
+---------------------------------------------------------
+####  The criteria of convergence of potential: convergence is achieved if less than the value
+####  
+
+convergence of potential critical value   =1d-4
+####   Maximum iterations for the convergence
+max iteration of potential convergence           =20
+
+---------------------------------------------------------
+####   Whether turn on gravitational wave orbital dissipation of orbits
+####   
+
+GW outer orbit                          =0
+###   If =1, need to specify criteria of EMRIs
+###   Samples with (this value)*(GW timescale)<(two-body relaxation timescale) is considered as EMRIs **when the sample cross emax or lc**
+###   --EMRI criteria                   = 0.1
+###   Output details of the EMRI samples into a bin file (in output/ecev/bin/emris)
+###   --output EMRI data bin            =1
+
+---------------------------------------------------------
+####   The method to calculate density
+####   Can be ``G(X)" or ``INDVD"
+####
+density estimation method = G(X)
+####   If =``INDVD'' 
+####   Specify criteria of sample variance
+####   --density bin criteria = 0.1
+
+---------------------------------------------------------
+####   Calculate density using j-averaged x or x-j
+####   Can be set to ``1D'' (j-averaged x) or ``2D" (x and j)
+
+density integration method      =1D
+
+---------------------------------------------------------
+####   Whether turn on loss cone
+####
+
+loss cone    					= 1
+####   If =1, specify eta, the loss cone size is given by eta**(1/3)*r_td, where r_td=r_*(mbh/m_*)**(1/3)
+--rtd  eta                      = 1 
+
+---------------------------------------------------------
+####   Whether turn on cloning of particles
+####
+
+clone scheme                    =1
+####   If =1 need to specify 
+####   Only particles with dimensionless energy >e0 consider clone scheme
+--e0                         =  2
+####   Boundaries of energies in clone scheme. For example, if =10, energies 10, 100, 1000, ... will
+####   duplicate particles
+--clone separation in energy   =10 
+
+---------------------------------------------------------
+####   Whether remove particles with x<x_min
+####
+
+del exit emin                   =1
+
+---------------------------------------------------------
+####   Whether turn on stellar evolution 
+####   If =1, MOBSE is used
+
+stellar evolution               =0
+
+####   If =1, specify whether mass loss due to MS->evolved stars->compact objects are added to the gas reservoir
+####   --fraction of mass loss to gas reservoir = 0    
+
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+#######################Running parameters#################################
+
+####   Whether using the same seed value for running
+####   Set to >0: use seed value for given by ``running random seed''; 
+####   Set =0: use different seed each time the program runs;
+
+use same running random seed= 1
+
+---------------------------------------------------------
+####   The random seed value at running
+
+running random seed			= 200
+
+---------------------------------------------------------
+####   The task is new or appending one
+####   Can be ``NEW'', or ``APP''
+
+task mode = NEW
+####   If = ``APP'', need to set additionally the index of the task to begin with:
+####   --task begin index = 0
+
+---------------------------------------------------------
+####   Continue previous runs or starts from the beginning
+####   Can be ``NEW'' (new snapshot), ``APP'' (continue previous run), or 
+####   ``ONE'' (run only one snapshot and then stop)
+
+snapshot mode = NEW
+####   If = ``APP'', need to set additionally the index of the previous runs to continue:
+####   --snapshot begin index = 0
+
+---------------------------------------------------------
+####   The units of timestep
+####   Can be ``TNR'', ``TRH''
+####   ``TNR'' means the relaxation timescale use the minimum value of the 2-body relaxation timescale across the cluster
+####   ``TRH'' means the relaxation timescale use the 2-body relaxation timescale 
+####                 at influence radius of the MBH (only apply if MBH mass > 0 )
+
+timestep unit          = TRH
+####   Whether update the 2-body relaxation timestep  after each snapshot
+--update 2body relaxation timestep = 1
+
+---------------------------------------------------------
+####   The timestep of snapshot is a fraction of TNR or TRH
+
+fraction of timestep of snapshot   = 0.01d0
+
+####   Maximum time of timestep in unit of Myr
+max timestep of snapshot = 500
+
+---------------------------------------------------------
+####   Number of updates per shapshot of samples
+####   Update means: The cluster properties (such as density, potential, etc), removing samples exit abnormally (such as destroyed)
+
+num of particle update per snap  = 1
+
+---------------------------------------------------------
+####   running mode of time
+####   can be ``SNAP'', ``TTOT''
+
+running mode of time = TTOT
+####   If = SNAP, need to set 
+####   --num of total snapshots = 100
+####   
+####   If = TTOT, need to set
+--total time (Myr) = 12000
+
+
+---------------------------------------------------------
+####  output frequency of data and dms file
+####
+
+freq of data output             = 400
+freq of dms output           	= 1
+
+---------------------------------------------------------
+####   Chattery of the program
+####   =0, least output
+####   =1, show outcome of particles exit (only destroyed particles)
+####   =2, show outcome of all particles
+####   =3, debug mode, show details of the calculating for each particle
+####   =5, debug mode, pause after simulation of each particle
+
+chattery						= 0
+
+---------------------------------------------------------
+####   Whether store and output the trajectories and events of each particle
+####   This function works only if running with single threads
+
+trace all samples               = 0
+####   If turn on, need to specify the following 
+####   Whether store particles ends with tidal disruption
+####   --track tidal disruption = 0 
+####   Whether store particles ends with plunges
+####   --track plunge = 0 
+####   Whether store particles ends with emris
+####   --track emri = 0 
