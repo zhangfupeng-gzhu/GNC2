@@ -811,38 +811,13 @@ contains
 	f1inp=10**f1inp
 	!call splint_mylib(f2%xb,f2%fx,f2%y2a,f2%nbin, log10(r), f2inp)
 	call f2%get_value_l(log10(r), f2inp)
-	f2inp=10**f2inp
-	! call get_phi_star_full_range(spp,log10(r),fphiinp)
-	! select case(ctl%ebin_type)
-	! case(ebin_type_log)
-	! 	fphiinp=10**fphiinp
-	! !case(ebin_type_lin)
-	! end select
+	f2inp=10**f2inp 
 	if(ieee_is_nan(f2inp).or.ieee_is_nan(f1inp))then
 		print*, "nan detected, f2inp, f1inp, fphiinp=", f2inp, f1inp
 	end if
-	!vr2=2*(fphiinp+1d0/x-ex)-(jum*jc)**2/x**2
-	!if(vr2<=0)then
-		!print*, "jrest"
-		!print*, "vr2=",vr2
-		!print*, "fphiinp=", fphiinp
-		!print*, "ex=",ex
-		!print*, "jum=",jum
-		!print*, "jc=",jc
-		!print*, "x=",x
-		!
-	!	f(1)=0d0
-	!else
-		!vr=vr2**0.5d0
-		!if(x>pi/2d0-0.01d0)then
-		!	Ev=(jum*jc)**2/(2*ex*ra**2)
-		!else
-		!	Ev=(fphiinp+1d0/r)/ex-1
-		!end if
-		!Ev=(fphiinp+1d0/r)/ex-1
-		!zetah=ctl%v0**2*r0_cl**2/(jc**2)
-		f(1)=(r**2*ex/(jum*jc**2)*(f1inp-f2inp/3d0+2d0/3d0*f0))*aux_tmp
-	!end if
+	 
+	f(1)=(r**2*ex/(jum*jc**2)*(f1inp-f2inp/3d0+2d0/3d0*f0))*aux_tmp
+ 
 	if(ieee_is_nan(f1inp).or.ieee_is_nan(f(1)).or.(.not.ieee_is_finite(f(1))))then
 		print*, "nan detected,  f1inp=",  f1inp 
 		call f1%print("f1")
@@ -1059,9 +1034,7 @@ subroutine get_ffuncs_series_fast(ex,  mbhin,logr, jum, jc, ra,rp, spp, func, re
 		print*, "get_ffuncs_series: error! ratio<1,ratio=", ratio
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			print*, "phi_star, r, ex=", 10**yout,10**logr, ex 
-		CASE(ebin_type_lin)
-			print*, "phi_star, r, ex=", yout,10**logr, ex 
+			print*, "phi_star, r, ex=", 10**yout,10**logr, ex  
 		end select
 		stop
 	end if
@@ -1298,9 +1271,7 @@ subroutine get_ffuncs_series(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func, res, 
 
 	select case(ctl%ebin_type)
 	case(ebin_type_log)
-		ratio=(10**yout+mbhin/10**logr)/(ex)
-	case(ebin_type_lin)
-		ratio=(yout+mbhin/10**logr)/(ex)
+		ratio=(10**yout+mbhin/10**logr)/(ex) 
 	end select
 
 
@@ -1308,9 +1279,7 @@ subroutine get_ffuncs_series(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func, res, 
 		print*, "get_ffuncs_series: error! ratio<1,ratio=", ratio
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			print*, "phi_star, r, ex=", 10**yout,10**logr, ex 
-		CASE(ebin_type_lin)
-			print*, "phi_star, r, ex=", yout,10**logr, ex 
+			print*, "phi_star, r, ex=", 10**yout,10**logr, ex  
 		end select
 		stop
 	end if
@@ -1584,14 +1553,10 @@ subroutine mb_get_dc_mpi_starpt_gx_regular(mb,spp)
     allocate(ycenter(n),xcenter(n))
     allocate(e_110(n,n),e_0(n,n),ee(n,n), &
 			j_111(n,n),j_rest(n,n),jj(n,n),ej(n,n))
-    select case(mb%dc%jbin_type)
-    case(Jbin_type_lin)
-        ycenter=mb%dc%s2_de_110%ycenter      
+    select case(mb%dc%jbin_type) 
     case(jbin_type_log)
-        ycenter=10**mb%dc%s2_de_110%ycenter   
-	!	print*, "ycenter=",ycenter
-	case(jbin_type_sqr)   
-		ycenter=mb%dc%s2_de_110%ycenter**0.5d0
+        ycenter=10**mb%dc%s2_de_110%ycenter    
+	 
 	case default
 		print*, "error! define jbin_type_lin", mb%dc%jbin_type
 		stop
@@ -1601,9 +1566,7 @@ subroutine mb_get_dc_mpi_starpt_gx_regular(mb,spp)
 	!	f0,f1,f2,n,mb%all%barge,mb%all%asymp)
 	select case(ctl%ebin_type)
 	case(ebin_type_log)
-		xcenter=10**mb%dc%s2_de_110%xcenter
-	case(ebin_type_lin)
-		xcenter=mb%dc%s2_de_110%xcenter
+		xcenter=10**mb%dc%s2_de_110%xcenter 
 	end select
 	!print*, "xcenter=",xcenters
 	call get_lambda(lambda)
@@ -1617,15 +1580,7 @@ subroutine mb_get_dc_mpi_starpt_gx_regular(mb,spp)
     n0=mb%n0
 	!print*, "ctl%dejmodel=",ctl%dejmodel
     select case(ctl%Dejmodel)
-	case(dejmodel_EJ)
-		!if(rid.eq.0)then
-		!	call mb%all%barge%print("get_mpi: barge 0")
-		!end if
-		!print*, "start get_coeff_ej_spt",rid
-		
-		!if(rid.eq.1)then
-		!	call mb%all%barge%print("get_mpi: barge 1")
-		!end if
+	case(dejmodel_EJ) 
 		common_gx=mb%all%barge
 		call get_none_zero_s1d(mb%all%barge,common_gx)
 
@@ -1697,14 +1652,9 @@ subroutine mb_get_dc_mpi_starpt_gx_iregular(mb,spp)
     allocate(ycenter(n),xcenter(n))
     allocate(e_110(n,n),e_0(n,n),ee(n,n), &
 			j_111(n,n),j_rest(n,n),jj(n,n),ej(n,n))
-    select case(mb%dc%jbin_type)
-    case(Jbin_type_lin)
-        ycenter=mb%dc%s2_de_110%ycenter      
+    select case(mb%dc%jbin_type) 
     case(jbin_type_log)
-        ycenter=10**mb%dc%s2_de_110%ycenter   
-	!	print*, "ycenter=",ycenter
-	case(jbin_type_sqr)   
-		ycenter=mb%dc%s2_de_110%ycenter**0.5d0
+        ycenter=10**mb%dc%s2_de_110%ycenter    
 	case default
 		print*, "error! define jbin_type_lin", mb%dc%jbin_type
 		stop

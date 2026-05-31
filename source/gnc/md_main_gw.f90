@@ -1,7 +1,5 @@
 module com_main_gw
-	use model_basic
-	! use md_events
-    use md_sts
+	use model_basic 
     use md_coeff
     use MPI_comu
     use md_star_pot
@@ -370,32 +368,7 @@ contains
 		
 		select case(ctl%boundary_fj)
 		case(boundary_fj_iso)
-			bkps%jm=fpowerlaw_rnd(1d0,0.0044d0,0.99999d0) 
-		case(boundary_fj_ls)
-200		 	bkps%jm=fpowerlaw_rnd(1d0,0.01d0,0.99999d0)
-            print*, "stop, fj_ls not yet tested, correct mbh_radius -> mbh_iso_radius"
-			select type (bkps)
-				type is(particle_sample_type)
-					select case(bkps%obtype)
-					case(star_type_ms,star_type_rg,star_type_nakedHe)
-						rtd=(3*spp_new%mbh/bkps%m)**(1/3d0)*bkps%byot%ms%radius
-						jlc=(1-(1-rtd/ctl%rbd)**2)**0.5
-					case(star_type_bh,star_type_ns,star_type_wd,star_type_bd)
-						jlc=4*(mbh_radius/bkps%byot%a_bin)**0.5d0
-					case default
-						print*, "star type??", bkps%obtype
-						stop
-					end select
-				 
-                class default
-                print*, "error! defined type here"
-                stop
-			end select
-			tmp=rnd(0d0,1d0)
-			if(bkps%jm<jlc) goto 200
-			if(tmp>log(bkps%jm/jlc)/log(1d0/jlc)) goto 200
-			!end if
-			!bkps%byot%e_bin=(1-bkps%jm**2)**0.5
+			bkps%jm=fpowerlaw_rnd(1d0,0.0044d0,0.99999d0)  
 		case default
 			print*, "define flag INI", ctl%boundary_fj
 			stop

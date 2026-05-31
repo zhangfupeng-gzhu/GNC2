@@ -48,17 +48,16 @@ endif
 OUT=libgnc2.a
 
 OBJS= md_binary.o md_particle_sample.o md_stellar_history.o 
-OBJS+=chain_pointer_type.o chain_type.o sts_type.o coeff.o  dms.o  modules.o 
+OBJS+=chain_pointer_type.o chain_type.o   coeff.o  dms.o  modules.o 
 ifeq ($(use_mobse), 1)
 	OBJS+=mobse.o
 endif 
-OBJS+= md_main_gw.o  mobse_stellar.o mobse_stellar_by.o 
+OBJS+= md_main_gw.o  mobse_stellar.o 
 OBJS+= io_txt.o  ini.o ini_single.o  Sigma_funcs.o Sigma_funcs_aniso.o 
 OBJS+= EJ_funcs_ba16.o get_dc.o get_dc_2d.o
 OBJS+= ac_ec_evl_single.o
 OBJS+= sams_sub.o sams_sub_single.o clone.o 
-OBJS+=  stellar_obj.o
-OBJS+=  sams_sts.o sams_sts_single.o MPI_comu.o
+OBJS+=  stellar_obj.o  sams_sts_single.o MPI_comu.o
 OBJS+= read_ini_single.o  io_bin.o gen_ge.o
 OBJS+=  io_hdf5.o 
 OBJS+= evl_mbh_mass.o
@@ -74,7 +73,7 @@ OBJS+=RR_mpi.o
 MODS=  md_coeff.mod  model_basic.mod com_main_gw.mod
 MODS+= md_chain_pointer.mod md_chain.mod
 MODS+= md_binary.mod md_particle_sample.mod md_particle.mod 
-MODS+= md_sts.mod md_bk_species.mod md_dms.mod
+MODS+= md_bk_species.mod md_dms.mod
 MODS+=md_stellar_object.mod md_by_particle.mod   
 MODS+=md_mobse_stellar_single.mod  
 MODS+=  mpi_comu.mod
@@ -107,21 +106,17 @@ md_by_particle.o: chain_type.o
 stellar_obj.o: coeff.o md_bk_particle.o 
 
 dms.o: coeff.o md_by_particle.o md_bk_particle.o stellar_obj.o  chain_type.o
-
-# mobse_stellar_by.o : mobse_stellar.o
+ 
  
 modules.o: chain_type.o  dms.o md_by_particle.o  \
 	 mobse_stellar.o md_iso.o   chain_type.o
 
-MPI_comu.o : modules.o sts_type.o
+MPI_comu.o : modules.o  
  
-md_main_gw.o: modules.o  MPI_comu.o sts_type.o \
-	coeff.o 
+md_main_gw.o: modules.o  MPI_comu.o coeff.o 
 
 io_txt.o track.o ini.o ini_single.o Sigma_funcs.o EJ_funcs_ba16.o \
-sams_sub.o sams_sub_single.o .o   clone.o   \
-RR_ba16.o   sams_sts.o \
-read_ini_single.o usr_pro.o  io_bin.o io_hdf5.o   sams_sts_single.o gen_ge.o\
+sams_sub.o sams_sub_single.o .o   clone.o  read_ini_single.o usr_pro.o  io_bin.o io_hdf5.o   sams_sts_single.o gen_ge.o\
  RR_mpi.o ac_ec_evl_single.o   star_pt_dm.o  star_pt_sub.o\
 sigma_funcs_aniso.o get_dc.o get_dc_2d.o coe_subs.o evl_mbh_mass.o \
 star_funcs_full_range.o dstr_subs.o dstr_subs_2d.o self_consistent_pot.o \
@@ -133,6 +128,8 @@ ini_cond.o: modules.o
 read_ini_single.o ini.o:config.o
 
 ac_ec_evl_single.o read_ini_single.o:stellar_evolution.o
+
+stellar_evolution.o:evl_mbh_mass.o
 
 io_hdf5.o sams_sts_single.o ini_single.o:md_dms_saving_data.o event_data.o stellar_evolution.o
 

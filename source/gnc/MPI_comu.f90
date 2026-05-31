@@ -1,6 +1,5 @@
 module MPI_comu
-	use model_basic
-	use md_sts
+	use model_basic 
 	use mpi
 	implicit none
 	!include 'mpif.h'
@@ -15,9 +14,7 @@ contains
 		!print*, "start"
 		call mpi_init(ierr)
 		!print*, "init"
-		call mpi_comm_rank(mpi_comm_world, rid,ierr)
-		!print*, "rid=", rid
-		!print*, "size",ctl%ntasks
+		call mpi_comm_rank(mpi_comm_world, rid,ierr) 
 		call mpi_comm_size(mpi_comm_world, ctl%ntasks, ierr)
 		sample_threads_number=ctl%ntasks
 		proc_id=getpid()
@@ -38,45 +35,9 @@ contains
 		call MPI_Type_free(BINARY_MPI_TYPE_, ierr)
 		call mpi_finalize(ierr)
 	end subroutine
-	subroutine collect_data_mpi(fx,nbin,ibg,ied,ntasks)
-		implicit none
-		integer nbin
-		real(8) fx(nbin)
-		real(8),allocatable::reivbuffer(:)
-		real(8),allocatable::sentbuffer(:)
-		integer i, j, k, ibg,ied, sent_count, ierr
-		integer idbg, ided,nblocks, ntasks
-
-		allocate(reivbuffer(nbin))
-		allocate(sentbuffer(nbin))
-		sentbuffer=0
-		reivbuffer=0
-		if(mod(nbin, ntasks).ne.0)then
-			print*, "error in collect data mpi!: ntasks is not times of nbin"
-			stop
-		end if
-		sent_count=nbin/ntasks
-		do i=1, ntasks
-			idbg=(i-1)*sent_count+1
-			ided=i*sent_count
-			sentbuffer(idbg:ided)=fx(ibg:ied)
-		end do
-		
-		call mpi_alltoall(sentbuffer,sent_count, MPI_DOUBLE, reivbuffer, sent_count, &
-			MPI_DOUBLE, mpi_comm_world, ierr)
-
-		!do i=1, ntasks
-		!	idbg=(i-1)*ntasks+1
-		!	ided=i*ntasks
-		!	fx(idbg:ided)=reivbuffer(idbg:ided)
-		!end do
-		fx=reivbuffer
-		
-	end subroutine
-	subroutine collect_data_mpi_y(fxy, nbin, nbg, ned, nblocks,ntasks)
-		!use com_main_gw
-		implicit none
-		!type(diffuse_coeffient_type)::dc
+	 
+	subroutine collect_data_mpi_y(fxy, nbin, nbg, ned, nblocks,ntasks) 
+		implicit none 
 		integer nbin
 		real(8) fxy(nbin, nbin)
 		real(8),allocatable::reivbuffer(:)
@@ -124,10 +85,7 @@ contains
 				!write(*,fmt="(A40, 6I6, 20F10.3)") "recv:rid, i,j,k,idbg,ided=", rid, i,j,k, idbg,ided, reivbuffer(idbg:ided)
 				fxy(j, 1:nbin)=reivbuffer(idbg:ided)
 			end do
-		end do
-		!call mpi_BARRIER(mpi_comm_world, ierr)
-		!print*, "rid=", rid
-		!!call dc%s2_de_110%print()
+		end do 
 
 	end subroutine
 	subroutine collect_data_mpi_x(fxy, nbin, nbg, ned, nblocks,ntasks)
@@ -179,142 +137,7 @@ contains
 		!print*, "rid=", rid
 		!!call dc%s2_de_110%print()
 
-	end subroutine
-	subroutine collect_to_root_sps_single(sps_send,sps, n)
-		!use com_main_gw
-		implicit none
-		integer i,n
-		type(particle_samples_arr_type)::sps(n)
-		type(particle_samples_arr_type) sps_send
-		!allocate(sps(ctl%ntasks))
-		do i=1, ctl%ntasks
-			if(i.ne.mpi_master_id+1)then
-				!print*, "rid,i=",rid,i
-				call send_particle_sample_arr_mpi(sps_send,sps(i), i-1, mpi_master_id)
-			!end if
-			else
-				sps(mpi_master_id+1)=sps_send
-			end if
-		end do
 	end subroutine 
-
-	subroutine send_particle_sample_arr_mpi(sps_send, sps_recv, proc_id_source,proc_id_dest)
-		!use com_main_gw
-		implicit none
-		type(particle_samples_arr_type)::sps_send,sps_recv
-		integer ierr, proc_id_source,proc_id_dest, i, nintarr, nrealarr
-		integer status(MPI_Status_size)
-		integer,allocatable::intarr(:,:)
-		real(8),allocatable::realarr(:,:)
-		type(binary),allocatable::by(:), byini(:),bybf(:)
-
-		if(rid.eq.proc_id_source)then
-			!print*, "source:rid=",rid,proc_id_dest
-			allocate(intarr(nint_particle,sps_send%n))
-			allocate(realarr(nreal_particle,sps_send%n))
-			allocate(by(sps_send%n),byini(sps_send%n),bybf(sps_send%n))
-			do i=1, sps_send%n
-				call conv_sp_int_real_arrays(sps_send%sp(i), intarr(1:nint_particle,i), realarr(1:nreal_particle,i))
-				by(i)=sps_send%sp(i)%byot
-				byini(i)=sps_send%sp(i)%byot_ini
-				bybf(i)=sps_send%sp(i)%byot_bf
-			end do
-			call mpi_send(sps_send%n,1, MPI_INTEGER,proc_id_dest,0,MPI_COMM_WORLD,ierr)
-			!print*, "sps_send:n=", sps_send%n, rid
-			call mpi_send(intarr, nint_particle*sps_send%n, MPI_INTEGER, proc_id_dest, 0, MPI_COMM_WORLD, ierr)
-			!print*, "intarr sent:rid=",rid
-			call mpi_send(realarr, nreal_particle*sps_send%n, MPI_DOUBLE_PRECISION, proc_id_dest, 0, MPI_COMM_WORLD, ierr)
-			!print*, "realarr sent:rid=",rid,realarr(1:2,1)
-            !print*, "by sent:rid=",rid,by(1)%a_bin, proc_id_source, proc_id_dest
-			call mpi_send(by(1:sps_send%n), sps_send%n, BINARY_MPI_TYPE_,proc_id_dest,0,MPI_COMM_WORLD,ierr)
-			!print*, "by sent:rid=",rid,by(1)%a_bin
-			call mpi_send(byini(1:sps_send%n), sps_send%n, BINARY_MPI_TYPE_,proc_id_dest,0,MPI_COMM_WORLD,ierr)
-			call mpi_send(bybf(1:sps_send%n), sps_send%n, BINARY_MPI_TYPE_,proc_id_dest,0,MPI_COMM_WORLD,ierr)
-			!print*, "bybf send:rid=",rid,bybf(2)%e_bin
-		elseif(rid.eq.proc_id_dest)then
-			!print*, "dest:rid=",rid,proc_id_source
-			call mpi_recv(sps_recv%n,1, MPI_INTEGER,proc_id_source,0,MPI_COMM_WORLD,status,ierr)
-
-			call sps_recv%init(sps_recv%n)
-			!print*, "sps_recv:n=", sps_recv%n, allocated(sps_recv%sp),rid
-			allocate(intarr(nint_particle,sps_recv%n))
-			allocate(realarr(nreal_particle,sps_recv%n))
-			allocate(by(sps_recv%n),byini(sps_recv%n),bybf(sps_recv%n))
-			
-			nintarr=nint_particle*sps_recv%n; nrealarr=nreal_particle*sps_recv%n
-
-			call mpi_recv(intarr, nintarr, MPI_INTEGER, proc_id_source, 0, mpi_comm_world,status, ierr)
-			!print*, "intarr recv:rid=",rid
-			call mpi_recv(realarr, nrealarr, MPI_DOUBLE_PRECISION, proc_id_source, 0, mpi_comm_world, status,ierr)
-			!print*, "realarr recv:rid=",rid,realarr(1:2,1)
-			call mpi_recv(by(1:sps_recv%n), sps_recv%n, BINARY_MPI_TYPE_, proc_id_source, 0, mpi_comm_world, status,ierr)
-			!print*, "by recv:rid=",rid,by(1)%a_bin
-			call mpi_recv(byini(1:sps_recv%n), sps_recv%n, BINARY_MPI_TYPE_, proc_id_source, 0, mpi_comm_world, status,ierr)
-			call mpi_recv(bybf(1:sps_recv%n), sps_recv%n, BINARY_MPI_TYPE_, proc_id_source, 0, mpi_comm_world, status,ierr)
-			!print*, "bybf recv:rid=",rid,bybf(2)%e_bin
-			do i=1, sps_recv%n
-				call conv_int_real_arrays_sp(sps_recv%sp(i), intarr(1:nint_particle, i), realarr(1:nreal_particle,i))
-				sps_recv%sp(i)%byot=by(i)
-				sps_recv%sp(i)%byot_ini=byini(i)
-				sps_recv%sp(i)%byot_bf=bybf(i)
-				!call sps_recv%sp(i)%print("send_particle_sample_arr_mpi")
-			end do
-
-		end if
-	end subroutine
- 
-	  
-	subroutine conv_sp_int_real_arrays(sp, intarr, realarr)
-		!use com_main_gw
-		implicit none
-		class(particle_sample_type)::sp
-		integer nint, nreal
-		integer intarr(nint_particle)
-		real(8) realarr(nreal_particle)
-		intarr(1:5)=(/sp%id,sp%obtype,sp%obidx,sp%state_flag_last,sp%exit_flag/)
-		intarr(6:10)=(/sp%source,sp%within_jt, sp%rid, sp%idx, sp%length/)
-		intarr(11:12)=(/sp%write_down_track,sp%N_gene/)
-		realarr(1:5)=(/sp%create_time,sp%jph,sp%x,sp%jc,sp%ra/)
-		realarr(6:10)=(/sp%En,sp%en0,sp%exit_time,sp%Jm,sp%weight_clone/)
-		realarr(11:14)=(/sp%weight_real,sp%m,sp%r_lc,sp%jm0/)
-		realarr(15:19)=(/sp%period,sp%rp, sp%tgw, sp%weight_N,sp%simu_bgtime/)	
-	end subroutine
-	 
-
-	subroutine conv_int_real_arrays_sp(sp, intarr, realarr)
-		!use com_main_gw
-		implicit none
-		class(particle_sample_type)::sp
-		integer nint, nreal
-		integer intarr(nint_particle)
-		real(8) realarr(nreal_particle)
-		sp%id=intarr(1); sp%obtype=intarr(2); sp%obidx=intarr(3)
-		sp%state_flag_last=intarr(4);sp%exit_flag=intarr(5)
-		!intarr(1:5)=(/sp%id,sp%obtype,sp%obidx,sp%state_flag_last,sp%exit_flag/)
-		sp%source=intarr(6);sp%within_jt=intarr(7);sp%rid=intarr(8);
-		sp%idx=intarr(9)
-		sp%length=intarr(10); sp%write_down_track=intarr(11)
-		call track_init(sp, 0)
-		sp%N_gene=intarr(12)
-        
-		sp%create_time=realarr(1); sp%jph=realarr(2); sp%x=realarr(3)
-		sp%jc=realarr(4);sp%ra=realarr(5)
-		
-		sp%en=realarr(6);sp%en0=realarr(7);sp%exit_time=realarr(8);
-		sp%jm=realarr(9);sp%weight_clone=realarr(10)
-		!realarr(6:10)=(/sp%En,sp%en0,sp%exit_time,sp%Jm,sp%weight/)
-		!sp%weight_asym=realarr(11);
-        sp%weight_real=realarr(11); sp%m=realarr(12)
-		sp%r_lc=realarr(13);sp%jm0=realarr(14)
-		!realarr(11:15)=(/sp%weight0,sp%weight_real,sp%m,sp%r_lc,sp%jm0/)
-		sp%period=realarr(15);sp%rp=realarr(16);sp%tgw=realarr(17)
-		sp%weight_N=realarr(18)
-        sp%simu_bgtime=realarr(19)
-		!call sp%print("conv_int_real_arrays_sp")
-		!realarr(16:18)=(/sp%period,sp%rp, sp%tgw/)	
-	end subroutine
-
-	 
 
 	subroutine declare_particle_mpi_type()
 		!use com_main_gw
@@ -325,9 +148,7 @@ contains
 		integer ierr, blocklen(ptcomp), vatype(ptcomp)
 		!integer,dimension(ptcomp)::disp=kind(MPI_ADDRESS_KIND)
 		!integer::base=kind(MPI_ADDRESS_KIND)
-		integer(KIND=MPI_ADDRESS_KIND)::disp(ptcomp), base
-		
-		
+		integer(KIND=MPI_ADDRESS_KIND)::disp(ptcomp), base 
 		call mpi_get_address(pt%x, disp(1),ierr)
 		call mpi_get_address(pt%vx, disp(2),ierr)
         call mpi_get_address(pt%spin, disp(3),ierr)

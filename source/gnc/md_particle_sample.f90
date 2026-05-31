@@ -54,30 +54,17 @@ module md_particle_sample
 	integer,parameter::state_td=71
 	
     integer,parameter::exit_normal=1
-    integer,parameter::exit_other=100
-	integer,parameter::exit_stellar_merge=101, exit_stellar_triple=102
-	integer,parameter::exit_x_ray_binary=103
-	integer,parameter::exit_stellar_collision=104
-	integer,parameter::exit_stellar_evl_supnov=105 
-    integer,parameter::exit_by_starbh_merger_3out=11002
-    integer,parameter::exit_by_starstar_merger_3out=11003 
-	integer,parameter::exit_by_exchange=13,exit_gw_bhb_mbh_enc=14, exit_gw_bhb_mbh_enc_later=114
-	
-    
-	integer,parameter::exit_gw_3body_enc_byself=15,exit_gw_3body_enc_byself_later=115
-	integer,parameter::exit_gw_3body_enc_with_incoming=16, exit_gw_3body_enc_with_incoming_later=116
-	integer,parameter::exit_by_gw_embhb=17, exit_emri_single=180, exit_lc=181
-    integer,parameter::exit_emri_by=190, exit_plunge_by=191
+    integer,parameter::exit_other=100   
+	integer,parameter::exit_stellar_evl_supnov=105     
+	integer,parameter::exit_emri_single=180, exit_lc=181 
     
     integer,parameter::exit_tidal=2
     integer,parameter::exit_by_ignore=20
     integer,parameter::exit_merge_eject=200
     integer,parameter::exit_max_reach=3
 	integer,parameter::exit_boundary_min=4, exit_boundary_max=5
-	integer,parameter::exit_invtransit=7, exit_tidal_empty=8, exit_tidal_full=9,  exit_gw_iso=99
+	integer,parameter::exit_invtransit=7, exit_tidal_empty=8, exit_tidal_full=9 
 	
-
-
 	integer,parameter:: star_type_BH=1,star_type_NS=2,star_type_MS=3, star_type_WD=4
 	integer,parameter:: star_type_BD=5  ! brown dwarf 
 	integer,parameter:: star_type_RG=6
@@ -164,34 +151,22 @@ subroutine read_sample_info_107(sp,funit)
 	read(unit=funit) sp%exit_time,sp%r_lc,sp%m ,sp%en0,sp%jm0, &
                    sp%period,sp%rp,sp%tgw, sp%state_flag_last, sp%n_gene,sp%state_emri_last,sp%state_emri_current,sp%Lvl_clone
 	
-	read(unit=funit) sp%obtype, sp%obidx, sp%rid, sp%idx, sp%id
-!	print*, sp%obtype, sp%obidx
-	read(unit=funit) sp%byot,sp%byot_ini, sp%byot_bf
-	!sp%byot%a_bin=actmp; sp%byot%e_bin=ectmp
-	!---------------------------------------------------------
-	!print*, sp%byot%a_bin, sp%byin%a_bin
-   ! inquire(unit=funit, pos=mypos)
-	!call print_binary(sp%byin)
-	!read(*,*)
-   ! print*, "pos2=",mypos
+	read(unit=funit) sp%obtype, sp%obidx, sp%rid, sp%idx, sp%id 
+	read(unit=funit) sp%byot,sp%byot_ini, sp%byot_bf 
 	read(unit=funit) sp%length_to_expand,sp%exit_flag,sp%create_time,sp%En, sp%x, &
 				   sp%jph,sp%Jm, sp%rp, sp%ra, sp%period, sp%jc,sp%raq, &
 	               sp%write_down_track,sp%track_step,sp%source , &
                     sp%within_jt, sp%length, &
 					 sp%weight_real, sp%weight_N,sp%weight_clone
-					if(ieee_is_nan(sp%weight_real))then
-						print*, "error! sp%weight_real = NaN", &
-							sp%weight_real, sp%weight_N
-						stop
-					end if
-					!print*, "read",sp%byot%a_bin
- 	if(sp%length>0)Then
-		!print*, "sp%length=",sp%length
+	if(ieee_is_nan(sp%weight_real))then
+		print*, "error! sp%weight_real = NaN", &
+			sp%weight_real, sp%weight_N
+		stop
+	end if 
+ 	if(sp%length>0)Then 
 		if(allocated(sp%track))deallocate(sp%track)
 		allocate(sp%track(sp%length))
-		read(unit=funit) sp%track(1:sp%length)
-		!print*, "read: sizeoftrack:", sizeof(sp%track), sp%length
-		!stop
+		read(unit=funit) sp%track(1:sp%length) 
 	end if
 
 	call sp%sh%read_info(funit)
@@ -228,37 +203,23 @@ subroutine write_sample_info_107(sp,funit)
 	
 	write(unit=funit) sp%obtype, sp%obidx, sp%rid, sp%idx, sp%id
 
-	write(unit=funit) sp%byot,sp%byot_ini, sp%byot_bf
-	!sp%byot%a_bin=actmp; sp%byot%e_bin=ectmp
-	!---------------------------------------------------------
-	!print*, sp%byot%a_bin, sp%byin%a_bin
-   ! inquire(unit=funit, pos=mypos)
-	!call print_binary(sp%byin)
-	!read(*,*)
-   ! print*, "pos2=",mypos
+	write(unit=funit) sp%byot,sp%byot_ini, sp%byot_bf 
 	write(unit=funit)  sp%length_to_expand,sp%exit_flag,sp%create_time,sp%En, sp%x, &
 						sp%jph,sp%Jm, sp%rp, sp%ra, sp%period, sp%jc,sp%raq, &
 						sp%write_down_track,sp%track_step,sp%source , &
 						sp%within_jt, sp%length, &
 						sp%weight_real, sp%weight_N,sp%weight_clone	
-					if(ieee_is_nan(sp%weight_real))then
-						print*, "error! sp%weight_real = NaN",  &
-							sp%weight_real, sp%weight_N
-						stop
-					end if
-					!print*, "write",sp%byot%a_bin
- 	if(sp%length>0)Then
-		!print*, "write sp: rid, idx, m",&
-			 !sp%rid, sp%idx, sp%m, sp%exit_flag,sp%length
-		!	 call sp%print("write")
-		!stop
+	if(ieee_is_nan(sp%weight_real))then
+		print*, "error! sp%weight_real = NaN",  &
+			sp%weight_real, sp%weight_N
+		stop
+	end if 
+ 	if(sp%length>0)Then 
 		print*, "sp%length=",sp%length
 		write(unit=funit) sp%track(1:sp%length)
 	end if
 
-	call sp%sh%write_info(funit)
-	!print*, "write: sizeoftrack:", sizeof(sp%track), sp%length
-	!read(*,*)
+	call sp%sh%write_info(funit) 
 end subroutine
 
 

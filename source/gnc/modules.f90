@@ -330,10 +330,8 @@ module model_basic
 	integer,parameter::adb_est_method_fast=2, adb_est_method_acc=1 
 
 	integer,parameter::method_int_nearst=1, method_int_linear=2
-	integer,parameter::time_run_mode_snap=1,time_run_mode_ttot=2
-	!integer,parameter::plunge_criteria_nw=1, plunge_criteria_gr=2
-	integer,parameter::boundary_method_fix=1, boundary_method_reflesh=2
-	integer,parameter::boundary_fj_iso=1, boundary_fj_ls=2
+	integer,parameter::time_run_mode_snap=1,time_run_mode_ttot=2 
+	integer,parameter::boundary_fj_iso=1 
 	integer,parameter::ini_sample_mode_given=1, ini_sample_mode_mobse=2 
 	integer,parameter::ini_sample_mode_bse=3
 	integer,parameter::dejmodel_EJ=1, dejmodel_xj=2 
@@ -412,17 +410,7 @@ contains
 		case(exit_tidal_empty)
 			str_flag="TD EMPTY"
 		case(exit_tidal_full)
-			str_flag="TD FULL"   
-		case(exit_by_exchange)
-			str_flag="EXCHANGE"
-		case(exit_gw_bhb_mbh_enc)
-			str_flag="BHB MBH ENC"
-		case(exit_gw_3body_enc_byself)
-			str_flag="3BODY ENC SELF"
-		case(exit_gw_3body_enc_with_incoming)
-			str_flag="3BODY ENC INCOMING"
-		case (exit_gw_iso)
-			str_flag="GW_ISO"
+			str_flag="TD FULL"        
 		case default
 			str_flag="Null"
 		end select

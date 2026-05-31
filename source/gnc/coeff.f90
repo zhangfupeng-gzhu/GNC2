@@ -11,11 +11,10 @@ module md_coeff
     real(8):: log10emin_factor, log10emax_factor
 	type coeff_type
 		real(8) e,j,ee,jj,ej, e_110,e_0,j_111,j_rest, m_avg
-	end type
-	!type(coeff_type)::coeff_DEJ
+	end type 
 
-    integer,parameter::Jbin_type_lin=1, Jbin_type_log=2, Jbin_type_sqr=3
-	integer,parameter::ebin_type_lin=1, ebin_type_log=2
+    integer,parameter::Jbin_type_log=2 
+	integer,parameter::ebin_type_log=2
 	type diffuse_coeffient_type
 		type(s2d_type)::s2_de, s2_dee,s2_dj, s2_djj,s2_dej
  
@@ -50,24 +49,15 @@ contains
 		this%nbin=nbin
 		this%emin=emin; this%emax=emax; this%jmin=jmin; this%jmax=jmax
         this%jbin_type=jbin_type
-        select case(jbin_type)
-        case(Jbin_type_lin)
-            tmin=jmin
-            tmax=jmax
+        select case(jbin_type) 
         case(jbin_type_log)
             tmin=log10(jmin)
-            tmax=log10(jmax)
-		case(jbin_type_sqr)
-			tmin=jmin**2
-			tmax=jmax**2
+            tmax=log10(jmax) 
         end select
 		select case(ebin_type)
 		case(ebin_type_log)
 			smin=log10(emin)
-			smax=log10(emax)
-		case(ebin_type_lin)
-			smin=emin
-			smax=emax
+			smax=log10(emax) 
 		case default
 			print*, "error! ini_dffuse_coeffient"
 			stop

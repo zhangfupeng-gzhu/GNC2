@@ -194,28 +194,12 @@ subroutine dms_saving_data_get_sts(sars,se)
 			else
 				fdstr%fxw=0
 			end if
-
-			! do i=1, ctl%ntasks
-			! 	if(rid.eq.i-1)then
-			! 		print*, "rid,n=",rid,n
-			! 		print*, "x=",x(1:n)
-			! 		call se%fdstr_m%print("dstr bf")
-			! 	end if
-			! 	call mpi_barrier(mpi_comm_world,ier)
-			! end do
+ 
 			call collection_fx_int(fdstr%nb,fdstr%nbin)
 			call collection_and_avg_fx(fdstr%nbw,fdstr%nbin)
 			call collection_and_avg_fx(fdstr%fxw,fdstr%nbin)
 		end associate
-	end if
-	! do i=1, ctl%ntasks
-	! 	if(rid.eq.i-1)then
-	! 		print*, "rid,f=",rid
-	! 		call se%fdstr_m%print("dstr af")
-	! 	end if
-	! 	call mpi_barrier(mpi_comm_world,ier)
-	! end do
-	! stop
+	end if 
 end subroutine
 
 subroutine dms_saving_data_get_sts_td(sars,se)
@@ -286,29 +270,12 @@ subroutine dms_saving_data_get_sts_td(sars,se)
 				call fdstr%get_hst(x,w,n)
 			else
 				fdstr%fxw=0
-			end if
-
-			! do i=1, ctl%ntasks
-			! 	if(rid.eq.i-1)then
-			! 		print*, "rid,n=",rid,n
-			! 		print*, "x=",x(1:n)
-			! 		call se%fdstr_m%print("dstr bf")
-			! 	end if
-			! 	call mpi_barrier(mpi_comm_world,ier)
-			! end do
+			end if 
 			call collection_fx_int(fdstr%nb,fdstr%nbin)
 			call collection_and_avg_fx(fdstr%nbw,fdstr%nbin)
 			call collection_and_avg_fx(fdstr%fxw,fdstr%nbin)
 		end associate
-	end if
-	! do i=1, ctl%ntasks
-	! 	if(rid.eq.i-1)then
-	! 		print*, "rid,f=",rid
-	! 		call se%fdstr_m%print("dstr af")
-	! 	end if
-	! 	call mpi_barrier(mpi_comm_world,ier)
-	! end do
-	! stop
+	end if 
 end subroutine
 
 subroutine get_dms_saving_data(star_type_number,oe,ed)
@@ -469,52 +436,15 @@ subroutine dms_saving_data_get_emris_sts(sp,oe)
 			fdstr%nbw=0
 		end if
 		call collection_and_avg_fx(fdstr%nbw,fdstr%nbin)
-		call collection_and_avg_fx(fdstr%fxw,fdstr%nbin)
-		!call save_stsfcweight_hdf5(x(1:n), weights(1:n), &
-		!		n,hdf5_file%file_id,"1-eb",rangemin,rangemax,20,fc_spacing_log)		
+		call collection_and_avg_fx(fdstr%fxw,fdstr%nbin) 
 	end associate
 	
-	associate(f2dstr=>oe%fd_emris_nxj_ir)
-!		call f2dstr%init(dms%dstr_bins_e,ctl%dstr_bins_j,sample_logemin,sample_logemax,&
-!                log10(dms%jmin),log10(dms%jmax), use_weight=.true.)
+	associate(f2dstr=>oe%fd_emris_nxj_ir) 
 		f2dstr=dms%mb(1)%dsp(1)%p%nxj_ir
 		call f2dstr%get_hst(enx,log10(jm),weights,n)
 		call collection_and_avg_s2d(f2dstr%nxyw, f2dstr%nx,f2dstr%ny)
 	end associate
-end subroutine 
-
-subroutine get_dms_saving_data_rgs()
-	use com_main_gw
-	use md_dms_saving_data
-	implicit none
-	integer n,ierr
-	type(particle_samples_arr_type)::bksma_arr_sel,bksma_arr_ms_td,bksma_arr_lc
-	!integer n
-	real(8) nr, nw
-	real(8) nw1, nw2
-	logical,external::selection_td
-
-
-	call sams_arr_select_type_single(bksams_arr, bksma_arr_sel,star_type_RG) 
-	!print*, "selection"
-	call get_sample_select_numbers(bksma_arr_sel,exit_boundary_max,n, nw)
-	nr=n
-	!print*, "nr, nw=", nr, nw
-	!call collection_event_numbers(nr,nw)
-	
-
-	oe_rg%se_emax%n=nr
-	oe_rg%se_emax%nw=nw
-	oe_rg%se_emax%rate=nw/(ctl%run_snap_time_f-ctl%run_snap_time_i)
-
-	call collection_snap_events(oe_rg%se_emax,ctl%run_snap_time_f-ctl%run_snap_time_i)
-
-	if(ctl%include_loss_cone.ge.1)then
-		call sams_arr_select_condition_single(bksma_arr_sel, bksma_arr_ms_td,selection_td)
-		call dms_saving_data_get_sts(bksma_arr_ms_td,oe_rg%se_td)
-	end if
-
-end subroutine 
+end subroutine  
 
 subroutine get_dms_saving_data_all()
 	use com_main_gw
@@ -548,99 +478,8 @@ subroutine get_dms_saving_data_all()
 		call get_dms_saving_data(star_type_ns,oe_ns,data_ns)
 	end if
 
-end subroutine
+end subroutine 
  
- 
-logical function selection_within_bd(sp)
-    use com_main_gw
-    implicit none
-    type(particle_sample_type)::sp
-    if(sp%en<ctl%energy_boundary)then
-        selection_within_bd=.true.
-    else
-        selection_within_bd=.false.
-    end if
-end function 
-
-logical function selection_emri_sgsource(sp)
-	use com_main_gw
-	implicit none
-	type(particle_sample_type)::sp
-	integer flag
-
-	if((sp%exit_flag.eq.exit_boundary_max.or.sp%exit_flag.eq.exit_emri_single)&
-		.and.sp%source.eq.source_bk)then
-		selection_emri_sgsource=.true.
-	else
-		selection_emri_sgsource=.false.
-	end if
-end function
-
-logical function selection_mgene_single(sp)
-	use com_main_gw
-	implicit none
-	type(particle_sample_type)::sp
-	integer flag
-
-
-	if(sp%N_gene.ge.3)then
-		selection_mgene_single=.true.
-	else
-		selection_mgene_single=.false.
-	end if
-end function
-
-logical function selection_2gene_single(sp)
-	use com_main_gw
-	implicit none
-	type(particle_sample_type)::sp
-	integer flag
-
-
-	if(sp%N_gene.eq.2)then
-		selection_2gene_single=.true.
-	else
-		selection_2gene_single=.false.
-	end if
-end function
-  
-subroutine get_avgmass_single(sa,avg_mass)
-	use com_main_gw
-	implicit none
-	type(particle_samples_arr_type)::sa
-	real(8) avg_mass
-	integer i
-
-	avg_mass=0
-	do i=1,sa%n
-		avg_mass=avg_mass+sa%sp(i)%m
-	end do
-	avg_mass=avg_mass/dble(sa%n)
-end subroutine
-
-subroutine output_sts_emri_samples(smar, fout)
-	use com_main_gw
-	implicit none
-	type(particle_samples_arr_type)::smar
-	character*(*) fout
-	integer i, n
-	real(8) agw(smar%n), egw(smar%n), m1(smar%n),m2(smar%n)
-	real(8),parameter::freqob=0.1 !mHz
-	real(8),parameter::freq_simu=freqob/1d3*86400*365.2425/2d0/pi
-
-	open(unit=123456,file=trim(adjustl(fout))//"samples")
-	do i=1, smar%n
-		write(unit=123456, fmt="(20E20.10)") smar%sp(i)%m, smar%sp(i)%byot%a_bin, smar%sp(i)%byot%e_bin
-	end do
-	close(unit=123456)
-	n=smar%n
-	m1=smar%sp(1:n)%m; m2=spp_new%mbh
-	call get_ae_given_fgw(smar%sp(1:n)%byot%a_bin, smar%sp(1:n)%byot%e_bin, m1 ,m2, n, freq_simu, agw,egw)
-	call output_sts_data_weight(1-egw(1:n), smar%sp(1:n)%weight_real, n, 1d-1, 1d0, 30,&
-		 fc_spacing_log, trim(adjustl(fout))//"eb_")
-	call output_sts_data_weight(smar%sp(1:n)%m, smar%sp(1:n)%weight_real, n, 5d0,80d0,30,& 
-		fc_spacing_log, trim(adjustl(fout))//"m_")
-end subroutine
 subroutine get_ae_given_fgw(a,e,m1,m2,n,fgw,agw,egw)
 	implicit none
 	integer n,i

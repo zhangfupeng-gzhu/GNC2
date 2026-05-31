@@ -12,9 +12,7 @@ subroutine get_alpha_full_range(fphi,logr, alpha_out,spp)
 	call get_phi_star_full_range(spp,logr, phi_out)
 	select case(ctl%ebin_type)
 	case(ebin_type_log)
-		alpha_out=10**logr*10**phi_out/spp%mbh_dmless
-	case(ebin_type_lin)
-		alpha_out=10**logr*phi_out/spp%mbh_dmless
+		alpha_out=10**logr*10**phi_out/spp%mbh_dmless 
 	end select
 end subroutine
 subroutine get_phi_star_full_range(spp, logr, phi_out)

@@ -36,21 +36,14 @@ subroutine run_one_snap(cur_time_i, cur_time_f,  smsa, n,update_dms)
         !call check_rp_ra("before RR_mpi")
  
 
-        call mpi_BARRIER(mpi_comm_world, ierr)
-        !call check_boundary("bg")
-        call RR_mpi(bksams, ctl%run_snap_time_inner_steps_f)
-        !call check_boundary("ed")
+        call mpi_BARRIER(mpi_comm_world, ierr) 
+        call RR_mpi(bksams, ctl%run_snap_time_inner_steps_f) 
         call mpi_BARRIER(mpi_comm_world, ierr) 
 
         if(rid.eq.0)then
             print*, "reset time"
         end if
-        call reset_create_time(bksams)
-        !call init_chattery()
-
-        !if(ctl%barge_evl_method.eq.barge_evl_method_direct)then
-        !    call get_sample_para(dms,bksams_arr_norm,.false.,spp_new)
-        !end if
+        call reset_create_time(bksams) 
         if(ctl%trace_all_sample.gt.0.or.ctl%insnapmode.eq.snap_mode_one)then
             call update_arrays_single(.false.)
             cycle
@@ -61,20 +54,16 @@ subroutine run_one_snap(cur_time_i, cur_time_f,  smsa, n,update_dms)
         call mpi_barrier(mpi_comm_world,ierr) 
 
         call update_sample_energy_indvd(ctl%replace_sample_eceed_emax)
-        print*, "stpt:update energy finished", rid        
+		if(rid.eq.0)then
+        	print*, "update energy finished"
+		end if
         call mpi_barrier(mpi_comm_world,ierr)
 
     end do
     
     if(rid.eq.0)then
         call print_norm_dms(dms,chatterY_out_unit) 
-    end if
-
-    ! if(ctl%gw_radiation_inby.ge.1)then
-    !     write(unit=chattery_out_unit,fmt=*)  "rid, n_colld,n_colld_bh,n_colld_bh_2g, nexchange_tot, nexchange_2gene=",rid,&
-    !     ctl%num_collide_tot, ctl%num_bh_collide_tot, ctl%num_bh_2genecollide_tot, ctl%num_exchange_tot, &
-    !     ctl%num_exchange_2gene
-    ! end if 
+    end if 
 
     if(rid.eq.0)then
 		call cpu_time(t2)

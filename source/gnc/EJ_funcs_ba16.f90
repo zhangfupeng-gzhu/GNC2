@@ -32,10 +32,7 @@ subroutine fgx_mb_ir(x, fx,xmin,xmax)
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
         	call linear_int_fast(fc_ir_share%xb(1:fc_ir_share%nbin),fc_ir_share%fx(1:fc_ir_share%nbin),&
-			fc_ir_share%nbin, log10(x),yout)
-		case(ebin_type_lin)
-			call linear_int_fast(fc_ir_share%xb(1:fc_ir_share%nbin),fc_ir_share%fx(1:fc_ir_share%nbin),&
-			fc_ir_share%nbin, x,yout)
+			fc_ir_share%nbin, log10(x),yout) 
 		end select
  
 		fx=yout
@@ -57,10 +54,7 @@ subroutine fgx_mb(x, fx)
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
         	call linear_int_fast(fc_share%xb(1:fc_share%nbin),fc_share%fx(1:fc_share%nbin),&
-	            fc_share%nbin, log10(x),yout)
-		case(ebin_type_lin)
-			call linear_int_fast(fc_share%xb(1:fc_share%nbin),fc_share%fx(1:fc_share%nbin),&
-	            fc_share%nbin, x,yout)
+	            fc_share%nbin, log10(x),yout) 
 		end select
 		 
 		fx=yout

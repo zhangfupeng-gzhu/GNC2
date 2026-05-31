@@ -5,7 +5,7 @@ subroutine update_sample_para(sample,spp)
     type(star_pot_para)::spp
     real(8) ratio,  ecc_kpl, rp_dm, ra_dm,jc_dm,pd_dm
     real(8) phirp,  ac_dm,logx
-    real(8) x, rc, rmax,r_c,jc_dmless,p_EJ_dmless, jphlc2
+    real(8) x, rc, rmax,jc_dmless,p_EJ_dmless, jphlc2
     real(8) rdx,rdy,phi_out
     integer ier, nbin
     if(spp%mbh_dmless.eq.0)then
@@ -101,7 +101,7 @@ subroutine get_sample_para_one_kpl(dm,sp)
     type(particle_sample_type)::sp
     type(diffuse_mspec)::dm
     real(8) ex, logex, jc, jc_dm,jc_prev
-    real(8) rmax,r_c, rc,jm,jc_xy,rp_dm,ra_dm!,X
+    real(8) rmax, rc,jm,jc_xy,rp_dm,ra_dm!,X
     real(8) pd_xy,p_EJ_dmless
     integer ier
     if(ctl%chattery.ge.4)then
@@ -120,18 +120,8 @@ subroutine get_sample_para_one_kpl(dm,sp)
     !===========================
     if(ctl%chattery.ge.3)then
         print*, "state_emri_last=", sp%state_emri_last
-    end if
-   ! if(sp%state_emri_last.eq.1)then
-         !sp%jm=sp%jm*(1+sample_den/(2*sample_eni))+sample_djp/jc_prev
-         ! print*, "method1:", sp%jm, sp%jm*sample_den/(2*sample_eni)+sample_djp/jc_prev
-         ! sp%jm=(1+3/8d0*(sample_den/sp%en)**2)*sp%jph/sp%jc
-         ! print*, "method2:", sp%jm
-        !call get_c0()
-         !sp%jm=sp%jph/sp%jc
-         ! print*, "method3:", sp%jm
-    !else
-        sp%jm=sp%jph/sp%jc
-   ! end if
+    end if 
+	sp%jm=sp%jph/sp%jc
     
     call set_jm_bound(sp%jm)
     !===========================
@@ -146,9 +136,8 @@ subroutine get_sample_para_one_kpl(dm,sp)
     sp%ra=ra_dm*r0_cl
 
     if(ctl%chattery.ge.4)then
-    print*, "==end of sample_para_one_kpl==================="
- 
-    end if
+    	print*, "==end of sample_para_one_kpl==================="
+     end if
 end subroutine
 
 subroutine get_sample_para_one(dm,sp,spp)
@@ -158,7 +147,7 @@ subroutine get_sample_para_one(dm,sp,spp)
     type(diffuse_mspec)::dm
     type(star_pot_para)::spp
     real(8) ex, logex, jc, jc_dmless
-    real(8) rmax,r_c, rc,jm,jc_xy,rp_xy,ra_xy
+    real(8) rmax, rc,jm,jc_xy,rp_xy,ra_xy
     real(8) pd_xy,p_EJ_dmless_fast,r_c_iter!, jph_dmless
     integer ier
     if(ctl%chattery.ge.4)then
@@ -209,7 +198,7 @@ subroutine get_sample_para_one_appd(dm,sp,spp)
     type(diffuse_mspec)::dm
     type(star_pot_para)::spp
     real(8) ex, logex, jc, jc_dmless
-    real(8) rmax,r_c, rc,jm,jc_xy,rp_xy,ra_xy
+    real(8) rmax, rc,jm,jc_xy,rp_xy,ra_xy
     real(8) pd_xy,p_EJ_dmless,pd_dm,r_c_iter
     integer ier
     if(ctl%chattery.ge.3)then
@@ -220,14 +209,7 @@ subroutine get_sample_para_one_appd(dm,sp,spp)
     logex=log10(ex)
     sp%en=sp%x*ctl%energy0
     
-    call get_rmax_accurate(spp ,  dm%fr_phi, logex,rmax)
-
-    
-    !print*, "rmax=",rmax
-    !call get_rmax_accurate(dm%fphi_star,  dm%fr_phi, logex,rmax)
-    !print*, "rmax=",rmax
-    !read(*,*)
-! rc=r_c(spp,ex,ier)
+    call get_rmax_accurate(spp ,  dm%fr_phi, logex,rmax) 
     rc=r_c_iter(spp,ex,ier)
     jc_xy=jc_dmless(rc,spp)
     sp%jc=jc_xy*ctl%v0*r0_cl
@@ -247,23 +229,16 @@ subroutine get_sample_para_one_appd(dm,sp,spp)
         return
     end if
     call get_rpra_dmless_fast(spp, ex, jm, jc_xy, &
-                log10(rc), rmax, rp_xy,ra_xy)
-    !call get_rpra_dmless(spp, ex, jm, jc_xy, &
-    !            log10(rc), rmax, rp_xy,ra_xy)
+                log10(rc), rmax, rp_xy,ra_xy) 
     sp%rp=rp_xy*r0_cl       
-    sp%ra=ra_xy*r0_cl
-    !print*, "ex,jm,rp_xy,ra_xy,jc_xy=",ex,jm,rp_xy,ra_xy,jc_xy,rc
-    !pd_xy=p_EJ_dmless(spp, ex,jm,  jc_xy, rp_xy,ra_xy)
-    !sp%period=pd_xy*r0_cl/ctl%v0
+    sp%ra=ra_xy*r0_cl 
     select case(ctl%method_interpolate)
     case(method_int_linear)
         call linear_int_2d_xy(sample_table_idx,sample_table_idy,sample_table_rdx,sample_table_rdy,&
         dm%pd%fxy,dms%df_coe_bins,dms%df_coe_bins,pd_dm)
     case(method_int_nearst)
         pd_dm=dm%pd%fxy(sample_table_idx,sample_table_idy)
-    end select
-    !print*, "pd_dm=",pd_dm
-    !pd_dm=dm%pd%fxy(sample_table_idx,sample_table_idy)
+    end select 
     sp%period=pd_dm*r0_cl/ctl%v0
 
 end subroutine

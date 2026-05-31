@@ -291,10 +291,7 @@ subroutine set_ini_nx_ranges()
     select case(ctl%ebin_type)
     case(ebin_type_log)
         emin=log10emin_factor
-        emax=log10emax_factor
-    case(ebin_type_lin)
-        emin=emin_factor
-        emax=emax_factor
+        emax=log10emax_factor 
     end select
     
     call ctl%ini_nx_tot%init(emin,emax,ctl%dstr_bins_e,sts_type_dstr)
@@ -771,14 +768,9 @@ subroutine get_ini_ebounds()
                 print*, "logemin,logemax,logmbh_hz_emax=",log10emin_factor,log10emax_factor,log10(mbh_hz_emax)
             else
                 print*, "logemin,logemax=",log10emin_factor,log10emax_factor
-            end if
-            !print*, "ctl%energy_min, max=",ctl%energy_min,ctl%energy_max, ctl%loge_max_factor,ctl%energy0
-        case(ebin_type_lin)
-            print*, "emin_factor,emax_factor,mbh_hz_emax=",emin_factor,emax_factor
+            end if 
         end select
-        print*, "logrmin,logrmax=",dms%logrmin, dms%logrmax
-        !read(*,*)
-        !print*, "emindst,emaxdst=", emin_dstr_factor,emax_dstr_factor
+        print*, "logrmin,logrmax=",dms%logrmin, dms%logrmax 
     end if
 end subroutine
 subroutine get_init_fe_gs_dehnen(bin_mass, rmax,spp,dehnen,  xmin, mbhin, fe)
@@ -828,13 +820,8 @@ subroutine get_init_fe_gs_dehnen(bin_mass, rmax,spp,dehnen,  xmin, mbhin, fe)
 		fout=0
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			enx=10**fe%xb(i)
-		case(ebin_type_lin)
-			enx=fe%xb(i)
-		end select
-		
-		!call my_integral_none(logrmax,logrmin,fout,fcn_y,idid)
-		!print*, "xmin,x=",xmin, enx
+			enx=10**fe%xb(i) 
+		end select 
 		if(xmin<enx)then
             ier=-99
 			call my_gs_integral(xmin,enx, fout, 0d0,-0.5d0,1d-10,1d-10,1,fx,ier)
@@ -952,13 +939,8 @@ subroutine get_init_fe_gs_plummer(bin_mass, rmax,spp,plummer, xmin, mbhin, fe)
 		fout=0
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			enx=10**fe%xb(i)
-		case(ebin_type_lin)
-			enx=fe%xb(i)
-		end select
-		
-		!call my_integral_none(logrmax,logrmin,fout,fcn_y,idid)
-		!print*, "xmin,x=",xmin, enx
+			enx=10**fe%xb(i) 
+		end select 
 		if(xmin<enx)then
             ier=-99
 			call my_gs_integral(xmin,enx, fout, 0d0,-0.5d0,1d-8,1d-7,1,fx,ier)
@@ -987,17 +969,9 @@ contains
 		implicit none
 		real(8) x, r,phi,logr
 
-		phi=x
-		!call phi_tot_sorted%print("phi_tot_sorted")
-		!call phi_tot_sorted%get_value_s_y(log10(phi),logr)
-		!select case(ctl%ebin_type)
-		!case(ebin_type_log)
-			!call rmax%get_value_s(log10(phi), logr)
-			call get_rmax_accurate(spp,rmax,log10(phi),logr)
-		!case(ebin_type_lin)
-			!call rmax%get_value_s(phi, logr)
-		!	call get_rmax_accurate(fphi,rmax,phi,logr)			
-		!end select
+		phi=x 
+		call get_rmax_accurate(spp,rmax,log10(phi),logr)
+		 
 		r=10**logr
         call get_rho_full_range_spp(spp,logr,rho_tmp)
 		!call rho%get_value_s(logr,rho_tmp)

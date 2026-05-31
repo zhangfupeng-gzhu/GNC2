@@ -140,9 +140,7 @@ contains
             tmin=log10(jmin);tmax=log10(jmax)            
         end if
         if(eb_type.eq.ebin_type_log)then
-            smin=log10(dm%emin);smax=log10(dm%emax)
-        else
-            smin=dm%emin;smax=dm%emax
+            smin=log10(dm%emin);smax=log10(dm%emax) 
         end if
         call dm%ra%init(dm%df_coe_bins,dm%df_coe_bins,smin,smax,tmin,tmax,sts_type_dstr)
         call dm%rp%init(dm%df_coe_bins,dm%df_coe_bins,smin,smax,tmin,tmax,sts_type_dstr)

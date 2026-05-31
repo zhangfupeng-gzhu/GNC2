@@ -25,8 +25,7 @@ subroutine apply_paras()
 					ctl%barge_grid_type=barge_grid_type_iregular_phi
 				case("IREG_J")
 					ctl%barge_grid_type=barge_grid_type_iregular_jc
-					call tp%get_sub_para("--energy max min steps", str,ier)
-					!print*, "get sub str=", str
+					call tp%get_sub_para("--energy max min steps", str,ier) 
 					read(unit=str,fmt=*) gx_func_max_step,gx_func_min_step
 				case default
 					print*, "error ! define barge_grid type:",&
@@ -35,9 +34,7 @@ subroutine apply_paras()
 				end select
 			case("barg evaluate method")
 				read(unit=pvalue,fmt=*) ctl%str_barge_evl_method
-				select case(trim(adjustl(ctl%str_barge_evl_method)))
-				! case("GRID")
-					! ctl%barge_evl_method=barge_evl_method_grid
+				select case(trim(adjustl(ctl%str_barge_evl_method))) 
 				case("GRID_2D")
 					ctl%barge_evl_method=barge_evl_method_grid_2d
 				case default
@@ -156,13 +153,9 @@ subroutine apply_paras()
 				read(unit=pvalue,fmt=*) ctl%emax_boundary
 			case("bin type of angular momentum")
 				read(unit=pvalue,fmt=*) ctl%str_jbin_bd
-				select case(trim(adjustl(ctl%str_jbin_bd)))
-				case("LIN")
-					ctl%jbin_type=Jbin_type_lin
+				select case(trim(adjustl(ctl%str_jbin_bd))) 
 				case("LOG")
-					ctl%jbin_type=Jbin_type_log
-				case("SQR")
-					ctl%jbin_type=jbin_type_sqr
+					ctl%jbin_type=Jbin_type_log 
 				case default
 					print*, "error! define jbin type", ctl%str_jbin_bd
 					stop
@@ -171,18 +164,14 @@ subroutine apply_paras()
 				read(unit=pvalue,fmt=*) ctl%str_fj_bd
 				select case(trim(adjustl(ctl%str_fj_bd)))
 				case("ISO")
-					ctl%boundary_fj=boundary_fj_iso
-				case("LS")
-					ctl%boundary_fj=boundary_fj_ls
+					ctl%boundary_fj=boundary_fj_iso 
 				case default
 					print*, "error! define fj type", ctl%str_fj_bd
 					stop
 				end select
 			case("bin type of energy")
 				read(unit=pvalue,fmt=*) ctl%str_ebin_type
-				select case(trim(adjustl(ctl%str_ebin_type)))
-				case("LIN")
-					ctl%ebin_type=ebin_type_lin
+				select case(trim(adjustl(ctl%str_ebin_type))) 
 				case("LOG")
 					ctl%ebin_type=ebin_type_log
 				case default

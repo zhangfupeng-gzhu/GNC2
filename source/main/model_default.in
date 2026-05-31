@@ -96,13 +96,13 @@ energy and angular momentum in bins of = EJ
 
 ------------------------------------------------------------------
 ####   The bin type of angular momentum
-####   can be ``LOG'', ``LIN", or ``SQR"
+####   can only be ``LOG''
 
 bin type of angular momentum   =LOG
 
 ------------------------------------------------------------------
 ####   The bin type of energy
-####   Can be ``LOG" or ``LIN"
+####   Can only be ``LOG"  
 
 bin type of energy = LOG
 
@@ -343,14 +343,14 @@ freq of dms output           	= 1
 ####   =0, least output
 ####   =1, show outcome of particles exit (only destroyed particles)
 ####   =2, show outcome of all particles
-####   =3, debug mode, show details of the calculating for each particle
+####   =3, debug mode, show details of the calculation of each particle
 ####   =5, debug mode, pause after simulation of each particle
 
 chattery						= 0
 
 ---------------------------------------------------------
 ####   Whether store and output the trajectories and events of each particle
-####   This function works only if running with single threads
+####   This function works only if running with a single thread 
 
 trace all samples               = 0
 ####   If turn on, need to specify the following 

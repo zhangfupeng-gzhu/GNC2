@@ -233,32 +233,7 @@ subroutine set_chain_samples_single(cbk, bksps_arr)
     
 end subroutine
 
-
-subroutine roll_a_comp(rate, num_comp, idx_sel)
-	use com_main_gw
-	implicit NONE	
-	integer num_comp
-	real(8) aout, rnd, pos, rate(num_comp)
-	!integer bktype_arr(num_comp)
-	integer bktype
-	real(8):: ratio_tot=0, ratio_cum(10), rate_max, rate_rnd
-	integer idx_sel, rndI, idx_rnd
-	
-	if(num_comp.eq.1)then
-	!	bktype=bktype_arr(1)
-		idx_sel=1
-		return
-	end if
-	rate_max=maxval(rate(1:num_comp))
-100	idx_rnd=rndI(1, num_comp)
-	rate_rnd=rnd(0d0, rate_max)
-	if(rate(idx_rnd)>rate_rnd)then
-		idx_sel=idx_rnd
-	else
-		goto 100
-	end if
-	!bktype=bktype_arr(idx_sel)
-end subroutine 
+ 
 subroutine get_sample_ini_stellar_history(sp,tstart)
 	use com_main_gw
 	use md_stellar_history
@@ -270,11 +245,7 @@ subroutine get_sample_ini_stellar_history(sp,tstart)
 
 	kstar=get_kstar_integer("MS")
 	ctl%metal_z=0.02d0
-	call sp%sh%get_history(kstar,sp%m,ctl%metal_z,12000d0,tstart,0)
-	! if(sp%m>10)then
-	! 	call sp%sh%print()
-	! 	read(*,*)
-	! end if
+	call sp%sh%get_history(kstar,sp%m,ctl%metal_z,12000d0,tstart,0) 
 	call get_current_particle_stellar_info(sp,0d0,flag,.false.)
 end subroutine
 subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
@@ -285,14 +256,10 @@ subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
 	real(8) ecmax,logpd, beta, GET_T_GW, ini_ex
 	real(8),external:: rnd, gen_ran_from_dstr_consider_clone_cum,get_clone_deep
 	real(8),external:: gen_ran_from_dstr_consider_clone
-	real(8),external:: gen_ran_from_data,r_c, p_EJ_dmless_fast,r_c_iter
-	real(8) rmax,rc,jc_dmless,pd_xy,rp_xy,ra_xy,jc_xy,radius
-	! type(core_comp_type),pointer::cc
+	real(8),external:: gen_ran_from_data, p_EJ_dmless_fast,r_c_iter
+	real(8) rmax,rc,jc_dmless,pd_xy,rp_xy,ra_xy,jc_xy,radius 
 	integer midx, maxlocation(1),  max_lvl
-	integer i,ier,ini_sample_sg_mode
-    
-!      bkps%bytype must be assigned before calling this sub
-	!print*, "2=",  bkps%id, bkps%obtype, bkps%obidx
+	integer i,ier,ini_sample_sg_mode 
 	if(bkps%obtype.eq.0.or.bkps%obidx.eq.0)then
 		print*, "error:particle type not assigned", bkps%obtype, bkps%obidx
 		stop
@@ -370,10 +337,7 @@ subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
 		bkps%en= -ctl%v0**2*10**ini_ex
 		bkps%x=10**ini_ex
 		call get_rmax_accurate(spp_new,  dms%fr_phi, ini_ex,rmax)
-	case(ebin_type_lin)
-		bkps%en= -ctl%v0**2*ini_ex
-		bkps%x=ini_ex
-		call get_rmax_accurate(spp_new,  dms%fr_phi, log10(ini_ex),rmax)
+	 
 	end select
 	rc=r_c_iter(spp_new,bkps%x,ier)
 	!if(rc)
@@ -381,15 +345,7 @@ subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
 	bkps%jc=jc_xy*(r0_cl*ctl%v0)
 	
 200		call set_jm_init(bkps)
-
-	! print*, "x,j=",ini_ex,bkps%jm
-	!read(*,*)
-	!!test
-	!!
-	! if(bkps%m<0.1)then
-	! 	bkps%jm=0.001
-	! end if
-	!!test
+ 
     call get_rpra_dmless(spp_new, bkps%x, bkps%jm, jc_xy, &
                 log10(rc), rmax, rp_xy,ra_xy)
 	bkps%rp=rp_xy*r0_cl       
@@ -406,19 +362,13 @@ subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
 		call get_sample_jlc(bkps%x,spp_new%mbh_dmless,bkps%r_lc/r0_cl,bkps%jc/(ctl%v0*r0_cl),spp_new,sample_jlc_dimless,ier)
 		if(ier>0.or.ra_xy<bkps%r_lc/r0_cl)then
 			! print*, "type, sample_jlc_dimless,x,rmax=",midx,sample_jlc_dimless,bkps%jm,bkps%x, ra_xy, bkps%r_lc/r0_cl!, 10**rmax
-			if(ra_xy<bkps%r_lc/r0_cl)then
-				! print*, "goto 100"
-				! read(*,*)
+			if(ra_xy<bkps%r_lc/r0_cl)then 
 				goto 100
 			else
-				! print*, "goto 200"
-				! read(*,*)
+				 
 				goto 200
 			end if
-		end if
-		if(ctl%boundary_fj.eq.boundary_fj_ls)then
-			if(bkps%jm<sample_jlc_dimless)goto 100
-		end if
+		end if 
 	end if
 	call get_mass_idx(bkps%m,midx)
 	bkps%weight_n=ctl%Weight_n(midx)
@@ -437,13 +387,7 @@ subroutine get_one_kroupa_sample(sp,m1,m2,tstart)
 	
 	sp%m=m
 	kstar=get_kstar_integer("MS")
-	
-	
-	!if(sp%m>1.2)then
-	!	call sp%sh%get_history(kstar,m,ctl%metal_z,12000d0,tstart,1)
-	!	call sp%sh%print()
-	!	read(*,*)
-	!else
+	 
 	call sp%sh%get_history(kstar,m,ctl%metal_z,12000d0,tstart,0)
 	! if(sp%m>40)then
 	 	! call sp%sh%print()
@@ -456,11 +400,7 @@ subroutine get_one_kroupa_sample(sp,m1,m2,tstart)
 	 	! read(*,*) 
 
 	call get_current_particle_stellar_info(sp,0d0,flag,.false.)
-
-	!print*, sp%sh%cur_idx
-	!call sp%sh%print()
-	!print*, "m1,m2,m,sp%m,radius=",m1,m2,m,sp%m,sp%byot%ms%radius
-	!read(*,*)
+ 
 end subroutine
 subroutine simplfy_history(history)
 	use md_stellar_history
@@ -584,35 +524,18 @@ subroutine get_jm_idx(jm, idx, rdx,evjum)
 	!call dms%alpha_r%print("alpha_r")
 	!stop
 
-	select case(ctl%jbin_type)
-	case(jbin_type_lin)
-		!
-		evjum=jm
-	case(jbin_type_log)
-		!print*, "sample%jm=",sample%jm, evjum
-		evjum=log10(jm)
-		!print*, "evjum=",evjum
-	case(jbin_type_sqr)
-		evjum=jm**2
+	select case(ctl%jbin_type) 
+	case(jbin_type_log) 
+		evjum=log10(jm) 
 	case default
 		print*, "error! define jbtype", ctl%jbin_type
 	end select
 
-	select case(ctl%jbin_type)
-	case(Jbin_type_lin)
-		jmin=jmin_value
-		jmax=jmax_value
+	select case(ctl%jbin_type) 
 	case(Jbin_type_log)
 		jmin=log10(jmin_value)
-		jmax=log10(jmax_value)
-	case(jbin_type_sqr)
-		jmin=jmin_value**2
-		jmax=jmax_value**2
-	end select
-	
-	!call return_idxy(even,evjum,dms%logemin,dms%logemax,jmin,jmax,&
-	!dms%df_coe_bins,dms%df_coe_bins,idx,idy,dms%dc0%s2_dee%sts_type)
-	!print*, idx, idy
+		jmax=log10(jmax_value) 
+	end select 
 	call return_idx(evjum, jmin,jmax, dms%df_coe_bins, idx, &
 		coeff_sts_type_dc)
 
@@ -623,15 +546,8 @@ subroutine get_jm_idx(jm, idx, rdx,evjum)
 	end if
 	if(idx>dms%df_coe_bins)then
 		idx=dms%df_coe_bins
-	end if
-	!print*, "jm,evjum, idx=", jm, evjum, idx, jmin_value, jmax_value
-	rdx=(evjum-log10jmin_value)/dc_grid_ystep
-	!if(ctl%grid_type.eq.sts_type_grid)then
-	!	rdx=(even-dms%emin)/dc_grid_xstep
-	!	rdy=(evjum-dms%jmin)/dc_grid_ystep
-	!	idx=nint(rdx)+1
-	!	idy=nint(rdy)+1
-	!end if
+	end if 
+	rdx=(evjum-log10jmin_value)/dc_grid_ystep 
 end subroutine
 subroutine get_ex_idx_ir(ex,idx,rdx, even)
 	use model_basic
@@ -650,10 +566,7 @@ subroutine get_ex_idx_ir(ex,idx,rdx, even)
 	!sample%x=even
 
 	call return_idx_ir(dms%dc0%s2_dee%xcenter,dms%df_coe_bins,even, idx,sts_type_dstr)
-		
-	!call common_jc%print("common_jc")
-	!print*, "even, idx=",even, idx
-	!print*, "ex, even, emin,emax=", ex, even, dms%logemin, dms%logemax,log10emax_factor,log10emin_factor
+		 
 	if(idx<-1)then
 		idx=1
 		print*, "even, ex=",even, ex
@@ -662,28 +575,10 @@ subroutine get_ex_idx_ir(ex,idx,rdx, even)
 		idx=dms%df_coe_bins
 		print*, "even=",even
 	end if
-	if(ctl%method_interpolate.eq.method_int_linear)then
-		!nbin=dms%df_coe_bins
-		!rdx=(even-dms%logemin)/dc_grid_xstep
-		!rdy=(evjum-log10jmin_value)/dc_grid_ystep
+	if(ctl%method_interpolate.eq.method_int_linear)then 
 		rdx=idx-1+(even-(dms%dlxb_ir%xb(idx)-dms%dlxb_ir%xsteps(idx)/2d0))&
 			/dms%dlxb_ir%xsteps(idx)
-		!print*, "xb=",dms%dlxb_ir%xb
-		!print*, "xstep=",dms%dlxb_ir%xsteps
-		!print*, "rdx, even=",rdx,even,idx
-		!if(even>common_jc%xb(idx))then
-		!    if(idx<nbin)then
-		!        rdx=idx+(even-common_jc%xb(idx))/(common_jc%xb(idx+1)-common_jc%xb(idx))
-		!    else
-		!        rdx=idx+(even-common_jc%xb(idx))/(common_jc%xb(idx)-common_jc%xb(idx-1))
-		!    end if
-		!else
-		!    if(idx>1)then
-		!        rdx=idx+(even-common_jc%xb(idx))/(common_jc%xb(idx)-common_jc%xb(idx-1))
-		!    else
-		!        rdx=idx+(even-common_jc%xb(idx))/(common_jc%xb(idx+1)-common_jc%xb(idx))
-		!    end if
-		!end if
+		 
 	else
 		rdx=idx
 	end if
@@ -697,10 +592,7 @@ subroutine get_ex_idx(ex,idx,rdx,even)
 	select case(ctl%ebin_type)
 	case(ebin_type_log)
 		even=log10(ex)
-		smin=log10emin_factor; smax=log10emax_factor
-	case(ebin_type_lin)
-		even=ex
-		smin=emin_factor; smax=emax_factor
+		smin=log10emin_factor; smax=log10emax_factor 
 	case default
 		print*, "get_ex_idx define"
 		stop
@@ -727,9 +619,7 @@ subroutine get_ex_idx(ex,idx,rdx,even)
 
 	select case(ctl%ebin_type)
 	case(ebin_type_log)
-		rdx=(even-log10emin_factor)/dc_grid_xstep
-	case(ebin_type_lin)
-		rdx=(even-emin_factor)/dc_grid_xstep
+		rdx=(even-log10emin_factor)/dc_grid_xstep 
 	end select
 	
 

@@ -50,16 +50,10 @@ contains
 		real(8) emin, emax , r0_cl
 		real(8) rmin, rmax,jmin,jmax,tmin,tmax
 		integer jb_type
-		select case(jb_type)
-		case(Jbin_type_lin)
-			tmin=jmin
-			tmax=jmax
+		select case(jb_type) 
 		case(jbin_type_log)
 			tmin=log10(jmin)
-			tmax=log10(jmax)
-		case(jbin_type_sqr)
-			tmin=jmin**2
-			tmax=jmax**2
+			tmax=log10(jmax) 
 		end select
 
 		call so%fden%init(rmin, rmax, dstr_bins, coeff_sts_type_dc)
@@ -104,24 +98,15 @@ contains
 		integer jb_type,eb_type
 		real(8) tmin, tmax
 
-		select case(jb_type)
-        case(Jbin_type_lin)
-            tmin=jmin
-            tmax=jmax
+		select case(jb_type) 
         case(jbin_type_log)
             tmin=log10(jmin)
-            tmax=log10(jmax)
-		case(jbin_type_sqr)
-			tmin=jmin**2
-			tmax=jmax**2
+            tmax=log10(jmax) 
         end select
 
 		if(eb_type.eq.ebin_type_log)then
 			smin=log10(emin_in)
-			smax=log10(emax_in)
-		else
-			smin=emin_in
-			smax=emax_in
+			smax=log10(emax_in) 
 		end if
         !rmin=log10(0.5d0*r0_cl/(10**smax));rmax=log10(0.5d0*r0_cl/(10**emin))
 		!print*, "emin,smax,rmin,rmax,tmin,tmax=",emin,smax,rmin,rmax,tmin,tmax
@@ -252,9 +237,7 @@ contains
 		real(8) jc_xy, pd_xy
 
 		if(so%n.eq.0) return
-		select case(jbtype)
-		case(Jbin_type_lin)
-
+		select case(jbtype) 
 		case(Jbin_type_log)
 			do i=1, so%nxj%nx
 				x=10**so%nxj%xcenter(i)
@@ -272,9 +255,7 @@ contains
 					!print*, "xystep=",so%nxj%nxyw(i,j), so%nxj%xstep, so%nxj%ystep
 					!read(*,*)
 				end do 
-			end do
-		case(Jbin_type_sqr)
-
+			end do 
 		case default
 			print*, "fxj error!"
 			stop
@@ -306,19 +287,7 @@ contains
         integer i, j,jbtype
         real(8) jm ,x, n0, mbhin, v0
 		if(so%n.eq.0) return
-		select case(jbtype)
-		case(Jbin_type_lin)
-			do i=1, so%nxj%nx
-			x=10**so%nxj%xcenter(i)
-				do j=1, so%nxj%ny
-					jm=so%nxj%ycenter(j)
-					so%gxj%fxy(i,j)=so%nxj%nxyw(i,j)/(x*log(10d0))&
-					/so%nxj%xstep/so%nxj%ystep &
-					*pi**(-1.5d0)*v0**6*x**2.5d0/jm/n0/mbhin**3
-					!print*, "xystep=",so%nxj%xstep, so%nxj%ystep
-					!read(*,*)
-				end do 
-			end do
+		select case(jbtype) 
 		case(Jbin_type_log)
 			do i=1, so%nxj%nx
 				x=10**so%nxj%xcenter(i)
@@ -330,19 +299,7 @@ contains
 					!print*, "xystep=",so%nxj%xstep, so%nxj%ystep
 					!read(*,*)
 				end do 
-			end do
-		case(Jbin_type_sqr)
-			do i=1, so%nxj%nx
-				x=10**so%nxj%xcenter(i)
-				do j=1, so%nxj%ny
-					jm=so%nxj%ycenter(j)**0.5d0
-					so%gxj%fxy(i,j)=so%nxj%nxyw(i,j)/(x*log(10d0))&
-					/so%nxj%xstep/so%nxj%ystep &
-					*pi**(-1.5d0)*v0**6*x**2.5d0/2d0/n0/mbhin**3
-					!print*, "xystep=",so%nxj%xstep, so%nxj%ystep
-					!read(*,*)
-				end do 
-			end do
+			end do 
 		case default
 			print*, "fxj error!"
 			stop

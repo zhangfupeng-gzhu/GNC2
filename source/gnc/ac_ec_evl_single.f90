@@ -34,8 +34,7 @@ subroutine run_one_sample(pt, run_time)
 			stop
 		end if
 		call show_sample_init(sample, total_time, time)
-
-		!call check_boundary("1")
+ 
 		out_flag_boundary=0
 
 		!print*, "sample%en, ctl%energy_boundary=", sample%en, ctl%energy_boundary
@@ -45,30 +44,7 @@ subroutine run_one_sample(pt, run_time)
 			print*, "??", sample%en, ctl%energy_boundary
 			print*, "sample%x, x2=",sample%x,sample%en/ctl%energy0, ctl%x_boundary
 			call sample%print("run_one_sample")
-			stop
-			
-			if(out_flag_boundary.eq.100)then
-				time_create=time
-				sample%create_time=time_create/2d6/pi
-
-				if(ctl%chattery.ge.3)then
-					print*, "cross at", time/2d6/pi
-					print*, "en0, jm0=",sample%en0/ctl%energy0, sample%jm0
-					print*, "en, jm, time_create=",sample%en/ctl%energy0, sample%jm
-				end if
-				select type(ca=>sample)
-				type is(particle_sample_type)
-					print*, "run particle inside cluster"
-					call run_one_sample_particle_inside_cluster(pt,time, total_time)
-				end select
-				!print*, "finished out",sample%exit_flag
-				!read(*,*)
-				print*, "ac_ec_evl: sample%en>ctl%energy_boundary"
-				stop
-				 
-			else
-				sample%exit_time=time/2d6/pi
-			end if
+			stop 
 		else
 			select type(ca=>sample)
 			type is(particle_sample_type)
@@ -157,61 +133,13 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 				if(sample%weight_real<1d-30)then
 					print*, "error!, sample%weight_real=",sample%weight_real, sample%weight_n, sample%weight_clone,sample%Lvl_clone
 					stop
-				end if
-				!===============test===================
-				! block
-				! real(8) rc,jc_dm
-				! if(sample%obtype.eq.star_type_bd)then
-				! 	ctl%chattery=5
-				! 	sample%jm=0.0005; 
-				! 	sample%jph=sample%jm*sample%jc
-				! 	! print*, "sample%jc1=",sample%jc
-				! 	call get_sample_para_one_appd(dms,sample,spp_new)
-				! 	print*, "sample%jc2=",sample%jc
-				! 	block
-				! 		real(8)phi_out,rp_dm,jph_dm, xk,jk,ek1,ek2
-				! 		call get_phi_star_full_range(spp_new,log10(sample%rp/r0_cl),phi_out)
-				! 		print*, "sample%x-phi(r_p)=",sample%x-10**phi_out
-						
-				! 		rp_dm=sample%rp/r0_cl
-				! 		print*, "r_p=",rp_dm
-				! 		jph_dm=sample%jph/(ctl%v0*r0_cl)
-				! 		print*, sample%x-10**phi_out-spp_new%mbh_dmless/rp_dm+jph_dm**2/2d0/rp_dm**2
-				! 		xk=sample%x-10**phi_out
-				! 		jk=jph_dm
-				! 		ek1=(1-2*jk**2*xk/spp_new%mbh_dmless**2)**0.5
-				! 		ek2=jk**2/spp_new%mbh_dmless/rp_dm-1
-				! 		print*, "ek1,ek2=",ek1,ek2
-				! 	end block
-				! 	! call spp_new%fphi_star%print("fphi")
-				! 	! call dms%alpha_r%print("alpha_r")
-				! 	! call dms%jc%print("jc")
-				! else
-				! 	ctl%chattery=0
-				! end if
-				! end block
-				!===============test===================
-				! if(sample%obtype.eq.star_type_BH)then
-				! 	call set_sample_give_xj(sample,2000d0,0.8d0 )
-				! 	sample%byot%a_bin=-spp_new%mbh/sample%en/2d0
-				! 	sample%byot%e_bin=(1-sample%jm**2)**0.5
-				! 	call get_c0(sample%byot%a_bin,sample%byot%e_bin,sample%byot%ms%m,sample%byot%mm%m,c0)
-				! 	ctl%chattery=5
-				! else
-				! 	return
-				! end if
-
-
+				end if 
 				loop1:do while(time<total_time)
-
-					!print*, "sample%en, x=",sample%en, sample%x, sample%jm
+ 
 					ctl%num_of_loops=ctl%num_of_loops+1
 
 					if(ctl%include_stellar_evolution.ge.1)then
-						call get_current_particle_stellar_info(sample,time/1d6/2d0/pi, flag_stellar_evl,ctl%chattery.ge.3)
-						! if(flag_stellar_evl.eq.1)then
-						! 	call add_mass_loss_to_gas_reservior(mass_change)
-						! end if
+						call get_current_particle_stellar_info(sample,time/1d6/2d0/pi, flag_stellar_evl,ctl%chattery.ge.3) 
 						if(flag_stellar_evl.eq.-1)then
 							sample%exit_flag=exit_stellar_evl_supnov
 							exit loop1
@@ -219,20 +147,7 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 					end if
 
 					call update_sample_para(sample,spp_new)
-					!call update_sample_para_direct(sample)
-					
-					! if(ctl%chattery.ge.5)then
-					! 	block 
-					! 		real(8) egw
-					! 		call get_e_given_ca(c0, sample%byot%a_bin, sample%byot%ms%m,sample%byot%mm%m,egw )
-					! 		print*, "c0,egw=",c0,egw,(1-sample%jm**2)**0.5, sample%byot%a_bin, -spp_new%mbh/sample%en/2d0
-					! 		read(*,*)
-					! 	end block
-					! end if
-
-					!print*, "log10emin_factor, log10emax_factor=",log10emin_factor, log10emax_factor
-					!print*, "idx,idy=",sample_table_idx,sample_table_idy
-					!print*, "sample%en=", sample%en
+					 
 					if(ctl%include_loss_cone.ge.1 )then
 						call get_sample_r_td(sample)
 						if(sample%jc.le.0d0)then
@@ -241,8 +156,7 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 						end if
 						call get_sample_jlc(sample%x,spp_new%mbh_dmless,sample%r_lc/r0_cl,sample%jc/(ctl%v0*r0_cl),spp_new,&
 							sample_jlc_dimless,ier)
-						if(ier.eq.1)then
-							!print*, "?????? jphlc2<=0"
+						if(ier.eq.1)then 
 							print*, "rtd, sp%x,  sp%r_lc, star_type_str(sp%obtype)"
 							print*, sample%r_lc/r0_cl,  sample%x, sample%r_lc, star_type_str(sample%obtype),&
 								sample%byot%ms%radius
@@ -260,9 +174,7 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 						end if
 						sample_jlc=sample_jlc_dimless*sample%jc
 					end if
-					call get_coeff(sample,coeNr, coeRR, coeGW)
-
-					
+					call get_coeff(sample,coeNr, coeRR, coeGW) 
 
 					if(ctl%include_loss_cone.ge.1)then
 						call if_sample_within_lc(sample)
@@ -271,15 +183,9 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 					if(ctl%include_stellar_evolution.ge.1)then
 						call get_step_stellar_evl(sample,steps,time,ctl%chattery.ge.3)
 					end if
-
-				!	print*, "--step finished--"
-					!print*, "steps=",steps
-					!print*, "after step:sample%en=",sample%en
-					!read(*,*)
+ 
 					en0=sample%en
-					jm0=sample%jm
-					!print*, "steps, r=", steps, mbh/(-2d0*sample%en)
-					!read(*,*)
+					jm0=sample%jm 
 					if(steps>1d99)then
 						print*, "af get_steps steps=",steps,ieee_is_finite(steps)
 						call sample%print("sample")
@@ -295,22 +201,10 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 					!period=P(sample%byot%a_bin)
 					period=sample%period
 					time_dt=steps*period 
-					call get_de_dj(sample, coeNR, coeRR,coeGW, time,time_dt,steps, period)
-					!print*, "den=", sample_den, sample_enf, steps, period
-					!print*, "coegw%e,j=", coegw%e, coegw%j
+					call get_de_dj(sample, coeNR, coeRR,coeGW, time,time_dt,steps, period) 
 					
 					call get_move_result(sample,sample_den,sample_djp,steps,&
-						sample_enf, sample_jf, sample_mef, sample_af)
-					! if(ctl%chattery.ge.3)then
-					! 	print*, "**************"
-					! 	print*, (sample%jph*(sample_den/2d0/sample%en)+sample_djp)/sample%jc
-					! 	print*, (sample%jph*(1-(sample%en/(sample%en+sample_den))**0.5)+sample_djp)/sample%jc
-					! 	print*, (sample%jph*(1-(sample%en/(sample%en+sample_den))**0.5)+sample_djp)/sample%jc&
-					! 		+3/8d0*(sample_den/sample%en)**2*sample%jph/sample%jc
-					! 	print*, "**************"
-					! end if
-			
-					
+						sample_enf, sample_jf, sample_mef, sample_af) 
 					if(ctl%chattery.ge.5)then
 						print*, "======================================================================="
 						print*, "sample_rlx_e_time,sample_rlx_j_time,sample_tgw_time=",sample_rlx_e_time,sample_rlx_j_time, sample_tgw_time, &
@@ -329,91 +223,49 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 								print*, "within_jt=",sample%within_jt
 							end if
 							if(sample%within_jt.eq.1)then	
-								
-								!print*, "ipdi,ipdf=",ipdi,ipdf
-								!read(*,*)	
-								!print*,abs(sample_djp0), sqrt(rttmp*mbh*2)
-								!stop
-								!block
-								
-								!	ratio=sample%r_lc/sample%byot%a_bin
-								!	jlc=sqrt(ratio)*sqrt(2-ratio)*sqrt(mbh*sample%byot%a_bin)
-								!	dt_block=(jlc-sample%jm*sqrt(mbh*sample%byot%a_bin))**2/coenr%jj
-								!	!
-								!	if(dt_block<(ipdf-0.5)*period)then
-								!		print*, dt_block, (ipdf-0.5)*period, sample%byot%a_bin, &
-								!			sample%en/ctl%energy0
-								!			read(*,*)
-								!	end if
-								!end block
+								 
 								if(ctl%chattery.ge.3)then
 									print*, "========================exiting=================="
 								end if
 								if(ctl%gw_radiation_otby.ge.1)then
-									!if(sample%byot%e_bin<0.9999d0)then
-										!if(sample_step_gw<ctl%emri_cri*min(sample_step_nr_e,sample_step_nr_j,&
-										!	sample_step_lc))then
-										
-										if(sample%state_emri_current.ge.1.and.sample%state_emri_last.ge.1)then
-											!print*, "a,e=",sample%byot%a_bin, sample%byot%e_bin  ! AU
-											!print*, "tgw,rlxe,rlxj(yr)=",sample_tgw_time/2/pi,sample_rlx_e_time/2/pi,sample_rlx_j_time/2/pi
-											!print*, sample_tgw_time<0.1*min(sample_rlx_e_time,sample_rlx_j_time)
-											!print*, "tgw2=", get_t_gw(sample%m,mbh,sample%byot%a_bin,sample%byot%e_bin)*1d6
-											!read(*,*)
-
-											!if(ctl%trace_all_sample.lt.record_track_detail)then
-											!	call add_track(time/1d6/(2*pi), sample,state_emri)
-											!else
-											!print*, "exit_emri_lc:sample%x,sample%Jm,tgw,rlxe,relj=",&
-									!sample%x,sample%jm,sample_tgw_time,sample_rlx_e_time,sample_rlx_j_time
-												sample%exit_flag=exit_emri_single
-												!print*, sample%byot%a_bin,sample%byot%e_bin, sample%m, mbh
-												!tgw=get_t_gw(sample%m,mbh,sample%byot%a_bin,sample%byot%e_bin)
-												!print*,"tgw=", tgw, " Myr"
-												!print*, "dt=", time_dt/2d0/pi/1d6, " Myr"
-												!print*, "sample_step_gw, sample_step_nr_e,sample_step_nr_j,sample_step_lc"
-												!print*, sample_step_gw, sample_step_nr_e,sample_step_nr_j,sample_step_lc
-												if(ctl%trace_all_sample.ge.record_track_detail)then
-													call add_track(time/1d6/(2*pi), sample,state_emri)
-												end if
-												exit loop1
-											!end if
+									if(sample%state_emri_current.ge.1.and.sample%state_emri_last.ge.1)then
+										sample%exit_flag=exit_emri_single 
+										if(ctl%trace_all_sample.ge.record_track_detail)then
+											call add_track(time/1d6/(2*pi), sample,state_emri)
 										end if
-									!end if
+										exit loop1 
+									end if 
 								end if
 
 								tidal_condition=.false.
-									if(sample%r_lc>mbh_iso_radius)then
-									tidal_condition=.true.
-								else
-									select case(sample%obtype)
-										case(star_type_ms,star_type_rg,star_type_nakedHe, star_type_bd)
-											if(sample%rp>2*mbh_radius)then
-												tidal_condition=.true.
-											end if
-									end select
-								end if
-								if(tidal_condition)then
-										if(abs(sample_djp0)<sample_jlc_dimless)then
-											sample%exit_flag=exit_tidal_empty
-										else
-											sample%exit_flag=exit_tidal_full
+								select case(sample%obtype)
+									case(star_type_ms,star_type_rg,star_type_nakedHe, star_type_bd)
+										if(sample%rp>2*mbh_radius)then
+											tidal_condition=.true.
 										end if
-										if(ctl%trace_all_sample.ge.record_track_nes.or.&
-										sample%write_down_track.ge.record_track_detail)then
-											call add_track(time/1d6/(2*pi), sample,state_td)
-										end if
-								else   
-										sample%exit_flag=exit_lc
-										if(ctl%trace_all_sample.ge.record_track_nes.or.&
-										sample%write_down_track.ge.record_track_detail)then
-											call add_track(time/2d6/pi,sample,state_plunge)
-										end if
-										ctl%num_of_lc=ctl%num_of_lc+1
-									end if							
-									exit loop1
-								 
+									case default
+								end select
 								
+								if(tidal_condition)then
+									if(abs(sample_djp0)<sample_jlc_dimless)then
+										sample%exit_flag=exit_tidal_empty
+									else
+										sample%exit_flag=exit_tidal_full
+									end if
+									if(ctl%trace_all_sample.ge.record_track_nes.or.&
+									sample%write_down_track.ge.record_track_detail)then
+										call add_track(time/1d6/(2*pi), sample,state_td)
+									end if
+								else   
+									sample%exit_flag=exit_lc
+									if(ctl%trace_all_sample.ge.record_track_nes.or.&
+									sample%write_down_track.ge.record_track_detail)then
+										call add_track(time/2d6/pi,sample,state_plunge)
+									end if
+									ctl%num_of_lc=ctl%num_of_lc+1
+								end if							
+								exit loop1
+								 
 							else
 								!! test if the particle dominate by GW radiation EACH TIME IT PASSED PARICENTER
 								if(ctl%gw_radiation_otby.ge.1)then
@@ -435,8 +287,7 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 						call add_track(time/1d6/(2*pi), sample,state_ae_evl)
 					end if
 
-					j=j+1
-			!!$			if(mod(j,1000).eq.0) print*, "rid,j=",rid,j,MAX_RUN_LENGTH
+					j=j+1 
 					if(j>MAX_RUN_LENGTH)then
 						sample%exit_flag=exit_max_reach
 						print*, "j=",j
@@ -447,12 +298,7 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 						print*, "step,ao,eo=", steps
 						print*, "within_jt=",sample%within_jt
 						print*, "sample%obtype=",star_type_str(sample%obtype)
-						!block
-						!	real(8) rtddm, jphlc2
-						!	rtddm=sample%r_lc/r0_cl
-						!	jphlc2=2*(1d0/rtddm-sample%x)
-						!	print*, jphlc2, rlstddm*(jphlc2)**0.5d0
-						!end block
+						 
 						print*, "sample_jlc, jlc_dmless=",sample_jlc, sample_jlc/sample%jc
 						print*, "sample%x,jm,jc,jcdm=",sample%x, sample%jm, sample%jc, sample%jc/(ctl%v0*r0_cl)
 						print*, "time, period=", time, period
@@ -466,72 +312,26 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 						print*, "sample_mef=",sample_mef
 						!stop
 					end if
-
-					!if(en1>ctl%energy_boundary)then
-					!    print*, "trans:", -mbh/2d0/en0/r0_cl, -mbh/2d0/en1/r0_cl, &
-					!    -mbh/2d0/ctl%energy_boundary/r0_cl
-					!end if
-					!call check("before clone")
+ 
 
 					if(steps>1d99.or.ieee_is_nan(steps).or.steps<0)then
 						print*, "bf get_dedj steps=",steps,ieee_is_finite(steps)
 						call sample%print("ac_ec_evl_single")
 						print*, "time, rid=", time, rid
 						stop
-					end if
-					!print*, "sample%en,x, jm=",sample%en, sample%x,sample%jm
+					end if 
 					
 					call move_de_dj_one(spp_new,sample,sample_eni,sample_enf, sample_jf, sample_mef,sample_af)
-					!print*, "sample%en,x, jm=",sample%en, sample%x,sample%jm
-					!if(sample%jm>1)then
-					!    Print*, "?af, jm=", sample%jm
-					!    stop
-					!end if
+					 
 					en1=sample%en
-					!print*, "time, en1=", time/2d0/pi/1d6, en1
-					time_next=time+time_dt
-
-					!if(ctl%chattery.ge.3)then
-					!    if(ctl%ntasks.gt.1)then
-					!        write(unit=chattery_out_unit,fmt=*) "steps,hiar, e0,e1, eclone, rid,flag_dedj=",steps,sample%source,&
-					!        en0/ctl%energy0, en1/ctl%energy0, ctl%clone_e0, rid, flag_dedj, sample%id
-					!    else
-					!	    write(*,*) "steps,hiar, e0,e1, eclone, rid,flag_dedj=",steps,sample%source,&
-					!        en0/ctl%energy0, en1/ctl%energy0, ctl%clone_e0, rid, flag_dedj, sample%id
-					!    end if
-					!end if
-					!print*, ctl%energy_max, ctl%energy_min, en1
-					!read(*,*)
-					!if(sample%x>5d2)then
-					!	ctl%chattery=4
-					!else
-					!	ctl%chattery=0
-					!end if
-
-					!!!!!!!!!!!!========================================
-					!! the following lines will remove samples before reaching horizon, so the density 
-					!! in the inner regions (usually within 10^-5r_0) will be lower estimated!! To derive 
-					!! the current density, some correction is needed!
-					!!
-					! if(ctl%gw_radiation_otby.ge.1)then
-					! 	if(sample%state_emri_last.ge.1.and. sample%state_emri_current.ge.1)then
-					! 		sample%exit_flag=exit_emri_single
-					! 		if(ctl%trace_all_sample.ge.record_track_detail)then
-					! 			call add_track(time/1d6/(2*pi), sample,state_emri)
-					! 		end if
-					! 		exit loop1
-					! 	end if
-					! end if
-					!!!!!!!!!!!========================================
-
-					if(en1<ctl%energy_max.and.spp_new%mbh_dmless.ne.0)then
-						!print*, "exit to emax: ", sample%en/ctl%energy0, ctl%energy_max/ctl%energy0
+					 
+					time_next=time+time_dt 
+					if(en1<ctl%energy_max.and.spp_new%mbh_dmless.ne.0)then 
 						sample%exit_flag=exit_boundary_max
 						boundary_sts_emax_cros=boundary_sts_emax_cros+1
 						 
 						if(ctl%trace_all_sample.ge.record_track_nes)then
-							sample%x=sample%en/ctl%energy0
-							!print*, "sample%x=",sample%x
+							sample%x=sample%en/ctl%energy0 
 							call add_track(time_next/2d6/pi,sample,state_emax)
 						end if
 						exit loop1
@@ -552,8 +352,7 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 						end if				
 					end if 
 
-					if(en1>ctl%energy_boundary)then
-						!call update_sample_para(sample)
+					if(en1>ctl%energy_boundary)then 
 						sample%exit_flag=exit_boundary_min
 						ctl%mass_move_out_of_emin=ctl%mass_move_out_of_emin+sample%weight_real*sample%m
 						exit loop1
@@ -607,19 +406,11 @@ subroutine print_results_single(pt,  id, eid,sample)
 	spid=sample%id
 	call get_star_type(sample%obtype,str_type)
 	select case(sample%exit_flag)
-		case(exit_normal)
-			!if(sample%en>ctl%energy_min)then
-			!	print*, "??"
-			!	stop
-			!end if
+		case(exit_normal) 
 			if(ctl%chattery.ge.2)then
 				write(chattery_out_unit,fmt="(A25, A5, 5I8, 2I10)") "-------time out",&
-                str_type,id, sample%source,rid,eid, sample%n_gene,spid, pt%ed%ob%id
-			
-				!print*, sample%x, sample%en/ctl%energy0
-				!read(*,*)
-			end if
-                !print*, sample%source
+                str_type,id, sample%source,rid,eid, sample%n_gene,spid, pt%ed%ob%id 
+			end if 
 		case(exit_tidal_empty)
 			write(chattery_out_unit,fmt="(A25, A5, 5I8, 2I10)") "-------td empty",&
                 str_type,id, sample%source,rid,eid, sample%n_gene, spid, pt%ed%ob%id
@@ -647,13 +438,7 @@ subroutine print_results_single(pt,  id, eid,sample)
 		case(exit_invtransit)
 		case(exit_other)
 			write(chattery_out_unit,fmt="(A25, A5, 5I8, 2I10)") "-------other",str_type,id, &
-                sample%source,rid,eid, spid, sample%n_gene, pt%ed%ob%id
-		case(exit_stellar_merge)
-			write(chattery_out_unit,fmt="(A25, A5, 5I8, 2I10)") "-------stellar_merge",str_type,id,&
-                sample%source,rid,eid, sample%n_gene, spid, pt%ed%ob%id
-        case(exit_by_exchange)
-            write(chattery_out_unit,fmt="(A25, A5, 5I8, 2I10)") "-------by exchange",str_type,id, &
-                sample%source,rid,eid, sample%n_gene, spid, pt%ed%ob%id
+                sample%source,rid,eid, spid, sample%n_gene, pt%ed%ob%id 
 		case(exit_stellar_evl_supnov)
 			write(chattery_out_unit,fmt="(A25, A5, 5I8, 2I10)") "-------supernovea",str_type,id, &
                 sample%source,rid,eid, sample%n_gene, spid, pt%ed%ob%id

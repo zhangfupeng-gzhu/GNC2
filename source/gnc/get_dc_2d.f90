@@ -576,37 +576,14 @@ subroutine fcn_e0(n, x, y, f, par, ipar)
 	!call splint_mylib(f2%xb,f2%fx,f2%y2a,f2%nbin, log10(r), f2inp)
 	call f2%get_value_s(log10(r), f2inp)
 	f2inp=10**f2inp
-	call get_phi_star_full_range(spp,log10(r),fphiinp)
-	!select case(ctl%ebin_type)
-	!case(ebin_type_log)
-		fphiinp=10**fphiinp
-	!case(ebin_type_lin)
-	!end select
+	call get_phi_star_full_range(spp,log10(r),fphiinp) 
+	fphiinp=10**fphiinp 
 	if(ieee_is_nan(f2inp).or.ieee_is_nan(f1inp).or.ieee_is_nan(fphiinp))then
 		print*, "nan detected, f2inp, f1inp, fphiinp=", f2inp, f1inp, fphiinp
 	end if
-	!vr2=2*(fphiinp+1d0/x-ex)-(jum*jc)**2/x**2
-	!if(vr2<=0)then
-		!print*, "jrest"
-		!print*, "vr2=",vr2
-		!print*, "fphiinp=", fphiinp
-		!print*, "ex=",ex
-		!print*, "jum=",jum
-		!print*, "jc=",jc
-		!print*, "x=",x
-		!
-	!	f(1)=0d0
-	!else
-		!vr=vr2**0.5d0
-		!if(x>pi/2d0-0.01d0)then
-		!	Ev=(jum*jc)**2/(2*ex*ra**2)
-		!else
-		!	Ev=(fphiinp+1d0/r)/ex-1
-		!end if
-		!Ev=(fphiinp+1d0/r)/ex-1
-		!zetah=ctl%v0**2*r0_cl**2/(jc**2)
-		f(1)=(r**2*ex/(jum*jc**2)*(f1inp-f2inp/3d0+2d0/3d0*f0inp))*aux_tmp
-	!end if
+	 
+	f(1)=(r**2*ex/(jum*jc**2)*(f1inp-f2inp/3d0+2d0/3d0*f0inp))*aux_tmp
+ 
 	if(ieee_is_nan(fphiinp).or.ieee_is_nan(f1inp).or.ieee_is_nan(f(1)).or.(.not.ieee_is_finite(f(1))))then
 		print*, "nan detected, fphiinp, f1inp=", fphiinp, f1inp 
 		call f1%print("f1")
@@ -637,8 +614,7 @@ subroutine fcn_e0(n, x, y, f, par, ipar)
 	!fphiinp=10**fphiinp
 	select case(ctl%ebin_type)
 	case(ebin_type_log)
-		fphiinp=10**fphiinp
-	!case(ebin_type_lin)
+		fphiinp=10**fphiinp 
 	end select
 	if(ieee_is_nan(f2inp).or.ieee_is_nan(f1inp).or.ieee_is_nan(fphiinp))then
 		print*, "nan detected, f2inp, f1inp, fphiinp=", f2inp, f1inp, fphiinp
@@ -888,9 +864,7 @@ subroutine get_ffuncs_series_fast_2d(ex,  mbhin,logr, jum, jc, ra,rp, spp, func,
 		print*, "get_ffuncs_series: error! ratio<1,ratio=", ratio
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			print*, "phi_star, r, ex=", 10**yout,10**logr, ex 
-		CASE(ebin_type_lin)
-			print*, "phi_star, r, ex=", yout,10**logr, ex 
+			print*, "phi_star, r, ex=", 10**yout,10**logr, ex  
 		end select
 		stop
 	end if
@@ -1219,9 +1193,7 @@ subroutine get_ffuncs_series_2d(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func,gxj
 
 	select case(ctl%ebin_type)
 	case(ebin_type_log)
-		ratio=(10**yout+mbhin/10**logr)/(ex)
-	case(ebin_type_lin)
-		ratio=(yout+mbhin/10**logr)/(ex)
+		ratio=(10**yout+mbhin/10**logr)/(ex) 
 	end select
 
 	
@@ -1230,22 +1202,13 @@ subroutine get_ffuncs_series_2d(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func,gxj
 		print*, "get_ffuncs_series: error! ratio<1,ratio=", ratio
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			print*, "phi_star, r, ex=", 10**yout,10**logr, ex 
-		CASE(ebin_type_lin)
-			print*, "phi_star, r, ex=", yout,10**logr, ex 
+			print*, "phi_star, r, ex=", 10**yout,10**logr, ex  
 		end select
 		stop
 	end if
-
-	!fout=0
-	tmin=min(max((ratio-exmax/ex)/(ratio-1)*(1d0+1d-9),0d0),1d0)
-	!if(tmin.ne.0.and.tmin.ne.1d0)then
-	!	print*, "ratio, r, ex,exmax=",ratio,10**logr, ex, exmax
-	!endif
-	tmax=min((ratio-exmin/ex)/(ratio-1),1d0)
-	!print*, "tmin=",tmin,tmax
-	!call my_integral_none(tmin,tmax,fout,fcn_y,idid)
-	!print*, "fout=",fout
+ 
+	tmin=min(max((ratio-exmax/ex)/(ratio-1)*(1d0+1d-9),0d0),1d0) 
+	tmax=min((ratio-exmin/ex)/(ratio-1),1d0) 
 	xmin=10**fc_ir_share%xmin
 	xmax=10**fc_ir_share%xmax
 	if(tmax-tmin<1d-9)then
@@ -1254,24 +1217,14 @@ subroutine get_ffuncs_series_2d(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func,gxj
 		if(fout.le.0)then
 			res=-100
 		else
-			res=log10((ratio-1)*fout)
-			!print*, "ratio,ex=",ratio,ex
-			!print*, "rp,ra,fx_tmp=",rp,ra,fx_tmp
-			!print*, "tmin,tmax=",tmin,tmax
-			!print*, "res=",res
-			!return
+			res=log10((ratio-1)*fout) 
 		end if
 		return
 	end if
 
 	fout=0
 
-	call my_integral_acc(tmin,tmax,fout,1d-12,1d-9,fcn_y,idid)
-	!call my_integral_none(0d0,1d0,fout,fcn_y,idid)
-	!print*, "fout=",fout
-	!read(*,*)
-
-
+	call my_integral_acc(tmin,tmax,fout,1d-12,1d-9,fcn_y,idid) 
 
 	if(idid<0)then
 		print*, "get_ffuncs_series:ipow,logr=", ipow, logr
@@ -1301,25 +1254,6 @@ subroutine get_ffuncs_series_2d(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func,gxj
 	end if
 
 	if(fout<=0)then
-		!print*, "ratio,logr=",ratio, logr
-		!print*, "phi_star, ex=", yout, ex
-		!stop
-		!print*, "corrected, ratio, logr, fout=", ratio, logr,fout 
-		!block
-		!	use com_main_gw
-		!	real(8) fxt
-		!	print*, "fout=",fout
-		!	call func(ex,fxt)
-		!	print*, "ex,f(ex)=", ex, fxt
-		!	call func(ex*ratio,fxt)
-		!	print*, "ex*ratio,f(ratio*ex)=",ex*ratio, fxt
-		!	call dms%mb(1)%all%barge%print("gx")
-		!	debug=1
-		!	fout=0
-		!	call my_integral_none(0d0,1d0,fout,fcn_y,idid)
-		!	read(*,*)
-		!end block
-
 		res=-100
 		return
 	end if
@@ -1487,14 +1421,9 @@ subroutine mb_get_dc_mpi_starpt_gx_iregular_2d(mb,spp)
     allocate(ycenter(n),xcenter(n))
     allocate(e_110(n,n),e_0(n,n),ee(n,n), &
 			j_111(n,n),j_rest(n,n),jj(n,n),ej(n,n))
-    select case(mb%dc%jbin_type)
-    case(Jbin_type_lin)
-        ycenter=mb%dc%s2_de_110%ycenter      
+    select case(mb%dc%jbin_type) 
     case(jbin_type_log)
-        ycenter=10**mb%dc%s2_de_110%ycenter   
-	!	print*, "ycenter=",ycenter
-	case(jbin_type_sqr)   
-		ycenter=mb%dc%s2_de_110%ycenter**0.5d0
+        ycenter=10**mb%dc%s2_de_110%ycenter    
 	case default
 		print*, "error! define jbin_type_lin", mb%dc%jbin_type
 		stop

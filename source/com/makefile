@@ -51,10 +51,7 @@ OBJ_INGL=ingl_dopri5.o d1mach.o \
     j4save.o xermsg.o \
     xerprn.o xersve.o \
     xerhlt.o xercnt.o dqagp.o dqagpe.o \
-	dqags.o dqagse.o dqk21.o dqelg.o \
-    xgetua.o intgl.o odeint.o \
-	rkqs.o rkck.o ingl_dopri853.o \
-	trapzd.o qsimp.o  polint.o 
+	dqags.o dqagse.o dqk21.o dqelg.o xgetua.o intgl.o  ingl_dopri853.o  
 	
 
 OBJ_FILE= FILE_STRING.o 

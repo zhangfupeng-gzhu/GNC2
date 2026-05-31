@@ -137,7 +137,7 @@ subroutine get_sample_para_one_xj_no_reset(ex,jm,spp,fr_phi,  &
  implicit none
  type(star_pot_para)::spp
  real(8) ex, logex, jc, jc_dmless
- real(8) rmax,r_c, rc,jm,jc_xy,rp_xy,ra_xy
+ real(8) rmax, rc,jm,jc_xy,rp_xy,ra_xy
  real(8) pd_xy,p_EJ_dmless_fast,r_c_iter
  type(s1d_type)::fr_phi
  integer ier
@@ -145,8 +145,7 @@ subroutine get_sample_para_one_xj_no_reset(ex,jm,spp,fr_phi,  &
  logex=log10(ex)
  
  call get_rmax_accurate(spp,  fr_phi, logex,rmax)
-
- !rc=r_c(spp,ex,ier)
+ 
  rc=r_c_iter(spp,ex,ier)
 
  jc_xy=jc_dmless(rc,spp)
@@ -165,7 +164,7 @@ end subroutine
     implicit none
     type(star_pot_para)::spp
     real(8) ex, logex, jc, jc_dmless,jph_xy,jm_xy
-    real(8) rmax,r_c, rc,jm,jc_xy,rp_xy,ra_xy,jph
+    real(8) rmax, rc,jm,jc_xy,rp_xy,ra_xy,jph
     real(8) pd_xy,p_EJ_dmless,jm0, r_c_iter
     type(s1d_type)::fphi_star,fr_phi,fma_star,frho_star
     integer ier
@@ -173,8 +172,7 @@ end subroutine
     logex=log10(ex)
     
     call get_rmax_accurate(spp,  fr_phi, logex,rmax)
-
-    !rc=r_c(spp,ex,ier)
+ 
     rc=r_c_iter(spp,ex,ier)
     
     jc_xy=jc_dmless(rc,spp)

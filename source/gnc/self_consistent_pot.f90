@@ -17,16 +17,7 @@ subroutine get_system_dstr(bks,reset_weighting,cri_max)
     call mpi_barrier(mpi_comm_world,ierr)
     if(rid.eq.0)then
         call cpu_time(t1)
-    end if
-
-    !print*, "???????"
-    !read(*,*)
-    !fmden_old=dms%all%all%fmden
-    !fphi_old=spp_new%fphi_star
-    !if(rid.eq.0)then
-    !    call fphi_old%print("phi_old")
-    !!    call fmden_old%print("fmden_old")
-    !end if
+    end if 
     spp0=spp_new
     if(rid.eq.0.and.ctl%chattery.ge.2)then
         call dms%all%all%fmden%print("fmden old")
@@ -42,23 +33,10 @@ subroutine get_system_dstr(bks,reset_weighting,cri_max)
     
 100 call get_nxgx_density(spp_new)
     
-    fmden_new=dms%all%all%fmden    
-
-    !if(rid.eq.0)then
-    !    call fmden_new%print("0 phi_new")
-    !end if
-    !if(rid.eq.15)then
-    !    call fmden_new%print("15 phi_new")
-    !end if
-
-    !call get_sample_rrange(sample_logrmin,sample_logrmax)
-    !sample_logrmin=dms%logrmin; sample_logrmax=dms%logrmax
+    fmden_new=dms%all%all%fmden     
     if(rid.eq.0)then
         print*, "sample_logrmin,logrmax=", sample_logrmin, sample_logrmax!,dms%logrmin,dms%logrmax
-    end if
-    !call fphi_new%init(dms%logrmin,dms%logrmax,dms%dstr_bins,sts_type_dstr)
-    !call fphi_new%set_range()
-
+    end if 
     call get_rho_rmin(spp_new)    
 
     call init_diffuse_mspec_rtables(dms)
@@ -86,9 +64,7 @@ subroutine get_system_dstr(bks,reset_weighting,cri_max)
     end if
     
     if(cri>cri_max.and.niter<max_self_con_iter) then
-        niter=niter+1
-        !fmden_old=dms%all%all%fmden
-        !fphi_old=spp_new%fphi_star
+        niter=niter+1 
         spp0=spp_new
         goto 100
     end if
@@ -97,14 +73,7 @@ subroutine get_system_dstr(bks,reset_weighting,cri_max)
     if(rid.eq.0)then
         call cpu_time(t2)
         print*, "get_system_dstr used time:", t2-t1, " s"
-    end if
-    !if(ctl%dc_grid_type.eq.dc_grid_irregular)then
-    !    call prepare_barge_ir_tables()
-    !end if
-    !if(spp_new%mbh_dmless.eq.0)then
-    !    call correct_sel_cons(spp_new)
-    !end if
-    
+    end if 
 end subroutine
  
 subroutine get_nxgx_density(spp)
@@ -116,30 +85,13 @@ subroutine get_nxgx_density(spp)
      
 	call gen_nxj_fxj_gx_iregular(dms,spp)  
 
-    call mpi_barrier(mpi_comm_world,ierr)
-    !call dms%mb(1)%all%barge%print("barge af")
-    !stop
-    !print*, "3",rid
-    !if(rid.eq.0.or.rid.eq.15)then
-    !    print*, "star collection",rid
-    !end if
-    !print*, "star collection",rid
+    call mpi_barrier(mpi_comm_world,ierr) 
     call collect_dms_gx(dms)
     if(ctl%chattery.ge.3.and.rid.eq.0)then
         print*, "start get_cluster_density"
     end if
     call get_cluster_density(dms)
-
-    
-    !call dms_tmp%all%all%fmden%print("fmden af")
-    !print*, "4",rid
-    !block 
-    !    real(8) t1,t2
-    !    call cpu_time(t1)
-    !call collect_dms_density(dms)
-    !    call cpu_time(t2)
-    !    print*, "collection density used time=",t2-t1
-    !end block
+ 
 end subroutine
  
  
@@ -175,9 +127,7 @@ subroutine adb_cor_indvd_replace(bks_org, spp0,sppc,adb_method)
             
         case(adb_est_method_fast)
             call get_adb_cor_one(bks_org%sp(i),spp0,sppc,de_tmp)
-
-        !    read(*,*)
-            
+ 
         end select
        
         !    read(*,*)
@@ -402,37 +352,11 @@ subroutine get_system_dstr_adb_cor_one_time( )
         !dmbh_tot=600
         spp_new%mbh=spp_new%mbh+dmbh_tot
         spp_new%mbh_dmless=spp_new%mbh/m0_cl
-        mbh_radius=spp_new%mbh/(my_unit_vel_c**2)
-
-        !print*, "mbh=", mbh, mbh_dmless, spp_new%mbh_dmless, spp_new%mbh, rid
-        !call get_system_dstr(bksams_arr_norm,.true.,ctl%gx_conv_cri)
+        mbh_radius=spp_new%mbh/(my_unit_vel_c**2) 
     end if 
-    call get_system_dstr(bksams_arr_norm,.true.,ctl%gx_conv_cri)
-    !fmden_new=dms%all%all%fmden    
-    !fphi_new=spp_new%fphi_star
-    !fma_new=spp_new%fma_star
-    !if(rid.eq.0)then
-    !    call fphi_new%print("phi_new")
-    !    call fmden_old%print("fmden_old")
-    !end if
-    !bks_tmp=bksams_arr_norm
-    !if(rid.eq.0)then
-    !    call test_adb(fphi_new, fphi_old, fmden_new, fma_new)
-    !end if
-    !call mpi_barrier(mpi_comm_world,ierr)
-
-    !========================================
-    !print*, "1"
+    call get_system_dstr(bksams_arr_norm,.true.,ctl%gx_conv_cri) 
     call adb_cor_indvd_replace(bksams_arr_norm, spp_old,spp_new,ctl%adb_est_method)
-    !========================================
-
-    !call get_system_dstr(bksams_arr_norm,.true.,ctl%gx_conv_cri)
-    !print*, "begin of second loop"
-    !if(ctl%barge_evl_method.eq.barge_evl_method_direct)then
-    !    call get_sample_para(dms,bksams_arr_norm,.false.)
-    !end if
-    !call get_system_dstr(bksams_arr_norm,.true.,ctl%gx_conv_cri)
-    !call get_sample_para(dms,bksams_arr_norm,.false.,spp_new)
+    
     if(rid.eq.0)then
         print*, "start get_orb_tables"
     end if
@@ -444,13 +368,7 @@ subroutine get_system_dstr_adb_cor_one_time( )
     end if
     call get_sample_para_no_pd(dms,bksams_arr_norm,ctl%replace_sample_eceed_emax,spp_new)
     
-
-
-
-    !if(rid.eq.0)then
-    !    call spp_new%fphi_star%print("phi_update")
-    !end if 
-    !call mpi_collect_energies()
+ 
     if(rid.eq.0)then
         call cpu_time(t2)
         print*, "end of adb cor one time, used time=", t2-t1, " s"        
@@ -572,10 +490,7 @@ loop1: do while (associated(ps))
                 else
                     if(bksams_arr_norm%sp(idx)%en<ctl%energy_max)then
                         sample%exit_flag=exit_boundary_max
-                        boundary_sts_emax_cros=boundary_sts_emax_cros+1
-                        !print*, "emax",bksams_arr_norm%sp(idx)%en,boundary_sts_emax_cros
-                        !bksams_arr_norm%sp(idx)%en=ctl%energy_max*2-bksams_arr_norm%sp(idx)%en
-                        !bksams_arr_norm%sp(idx)%x=bksams_arr_norm%sp(idx)%en/ctl%energy0
+                        boundary_sts_emax_cros=boundary_sts_emax_cros+1 
                     end if
                 end if
 
@@ -583,15 +498,7 @@ loop1: do while (associated(ps))
                     sample%exit_flag=exit_boundary_min
                     print*, "out_boundary: rid,sp%e,emin",rid,bksams_arr_norm%sp(idx)%en,exit_boundary_min
                     ctl%mass_move_out_of_emin=ctl%mass_move_out_of_emin+sample%weight_real
-                end if
-                !if(idx.eq.1) print*, "enb, enf=", sample%en, en(idx)
-                !print*, sample%en,bksams_arr_norm%sp(idx)%en
-                !print*, sample%x,bksams_arr_norm%sp(idx)%x
-                !print*, sample%rp,bksams_arr_norm%sp(idx)%rp
-                !print*, sample%ra,bksams_arr_norm%sp(idx)%ra
-                !print*, sample%jc,bksams_arr_norm%sp(idx)%jc
-                !print*, sample%period,bksams_arr_norm%sp(idx)%period
-                
+                end if 
                 en0=sample%en
                 en1=bksams_arr_norm%sp(idx)%en
                 sample%en=bksams_arr_norm%sp(idx)%en
@@ -602,8 +509,7 @@ loop1: do while (associated(ps))
                 sample%period=bksams_arr_norm%sp(idx)%period
                 sample%jm=bksams_arr_norm%sp(idx)%jm
                 sample%jph=bksams_arr_norm%sp(idx)%jph
-                sample%raq=bksams_arr_norm%sp(idx)%raq
-                !sample%weight_real=bksams_arr_norm%sp(idx)%weight_real
+                sample%raq=bksams_arr_norm%sp(idx)%raq 
                     !
                 condition=sample%exit_flag.eq.exit_boundary_min.or.sample%exit_flag.eq.exit_boundary_max
                 if(ctl%clone_scheme.ge.1.and.(.not.condition))then
@@ -637,52 +543,12 @@ loop1: do while (associated(ps))
         end if
         !read(*,*)
         ps=>pt
-    end do loop1    
-    !call sams_get_weight_clone_single(bksams_arr_norm)
-    !call set_real_weight_arr_single(bksams_arr_norm)
-    !call set_clone_weight(bksams)
-    !call set_real_weight(bksams)
+    end do loop1     
 
     call collection_int(update_correction_emax)
     call collection_and_avg_real(ctl%mass_move_out_of_emin)
 end subroutine
-
-
-
-subroutine mpi_collect_energies()
-    use com_main_gw
-    implicit none
-    real(8) energy(5)
-    real(8) sendbuffer_r(5,ctl%ntasks), reivbuffer_r(5,ctl%ntasks)
-    integer sendbuffer_i(5,ctl%ntasks), reivbuffer_i(5,ctl%ntasks)
-    !real(8) dmbh_tot
-    integer ierr, i
-    energy(1)=ctl%total_energy
-    energy(2)=ctl%energy_lost_emin
-    !do i=1, ctl%ntasks
-    !    sendbuffer((i-1)*3+1: i*3)=(/evl_star,evl_bh, evl_other/)
-    !end do
-    do i=1, 5
-        sendbuffer_r(i,:)=energy(i)
-    end do
-
-	call mpi_alltoall(sendbuffer_r,5, MPI_DOUBLE, reivbuffer_r, 5, &
-			MPI_DOUBLE, mpi_comm_world, ierr)
-    !call mpi_alltoall(sendbuffer_i,5, MPI_INTEGER, reivbuffer_i, 5, &
-	!		MPI_INTEGER, mpi_comm_world, ierr)
-
-    !do i=1,5
-        ctl%total_energy=sum(reivbuffer_r(1,:))/dble(ctl%ntasks)
-        ctl%energy_lost_emin=sum(reivbuffer_r(2,:))/dble(ctl%ntasks)
-        !ctl%evl_mbh_num_sample(i)=sum(reivbuffer_i(i,:))/dble(ctl%ntasks)
-    !end do
-    if(rid.eq.0)then
-        print*, "total energy, lost_e, rid=", ctl%total_energy, ctl%energy_lost_emin, rid
-    end if
-   call mpi_barrier(MPI_comm_world, ierr)
-end subroutine
-  
-   
+ 
 subroutine get_rc_given_jph(jph_xy,rc,spp)
     use md_star_pot
     use model_basic,only:ctl
@@ -722,33 +588,7 @@ subroutine get_maximum_ex_given_jph_fast(jph_xy ,ex,spp,mex)
     call get_phi_star_full_range(spp,log10(rc),phi_tmp)
     mex=(spp%mbh_dmless+2*10**phi_tmp*rc-beta_tmp)/2d0/rc
 end subroutine
-
-subroutine get_maximum_ex_given_jph(jph_xy ,ex,spp,mex)
-    use com_sts_type
-    use model_basic,only:emax_factor,emin_factor
-    use md_star_pot
-    implicit none
-    real(8) jph_xy
-   ! type(s1d_type)::fphi_star,fma_star
-    type(star_pot_para)::spp
-    real(8) rtbis_yacc,ex,par(50),mex
-    integer ier,niter
-
-    mex=rtbis_yacc(func,emin_factor,emax_factor,1d-7,par,niter,1000,ier,.true.)
-contains
-    real(8) function func(x,par)
-        implicit none
-        real(8) x, par(50)
-        real(8) r_c,jc_dmless,rc,jc_xy,r_c_iter
-       ! print*, "x=",x
-        !rc=r_c(spp,x,ier)
-        rc=r_c_iter(spp,x,ier)
-        jc_xy=jc_dmless(rc,spp)
-        !print*, "x,jc_xy,jph_xy=",x,jc_xy,jph_xy
-        func=jc_xy-jph_xy
-
-    end function    
-end subroutine
+ 
 subroutine get_dx_invariant_rad_action(ex,jm,jc,spp0,sppc,frphic,ra0,rp0,raq0,de)
     use com_sts_type
     use my_intgl

@@ -61,131 +61,7 @@ subroutine get_fden_ird_2d_one(logr,fden,gxj_ir,dm,spp)
     !print*, "logr,fden=",logr,fden
     !read(*,*)
 end subroutine
-subroutine get_gxr_bak(gxr,gxj_ir,logr,spp,dm,jc_pre)
-    use com_main_gw
-    implicit none
-    type(s1d_ird_type)::gxr
-    type(s2d_type)::gxj_ir
-    type(diffuse_mspec)::dm
-    type(star_pot_para)::spp
-    logical::jc_pre
-    real(8) t0,r,ex,logphi,jx,theta
-    real(8) logex, logr,jc_xy
-    real(8) rc, r_c_iter,jc_dmless
-    real(8) theta_max,theta_min
-    integer ier, i,j,idx,n
-    integer,parameter::nbin_size=300
-    !real(8),parameter:: yp1=1d30, ypn=1d30
-    !real(8) y2(gxj_ir%ny),yout,y(gxj_ir%ny), jx1, jmid,jx0,theta1,theta0,logt0
-    real(8) jx1, jmid,jx0,theta1,theta0,logt0
-    real(8) sintheta1,sintheta0,costheta1,costheta0
-
-
-    gxr%fx=0
-    r=10**logr
-    do i=1, gxr%nbin
-        ex=10**gxj_ir%xcenter(i)
-        call get_phi_star_full_range(spp,logr,logphi)
-        if(jc_pre)then
-            jc_xy=dms%jc_sample_erange%fx(i)
-            
-            !print*, "1, xb, jc_xy=",10**dms%jc_sample_erange%xb(i),jc_xy
-            !rc=r_c_iter(spp,ex,ier)
-            !jc_xy=jc_dmless(rc,spp)
-           ! print*, "2, ex, jc_xy=",ex, jc_xy
-           !read(*,*)
-        else
-            rc=r_c_iter(spp,ex,ier)
-            jc_xy=jc_dmless(rc,spp)
-        end if
-        !end block
-
-        t0=r/jc_xy*(2*(10**logphi+spp%mbh_dmless/r-ex))**0.5
-        !dlny=gxj_ir%ystep
-        !print*, "t0,r,phi,dlny=",t0,r,10**logphi!,dlny
-        !print*, "gj=", gxj_ir%ycenter
-        !if(jmax_value/t0<1d0)then
-        !    theta_max=asin(jmax_value/t0)
-        !else
-        !    theta_max=pi/2d0
-        !end if
-        !if(jmin_value/t0<1d0)then
-        !    theta_min=asin(jmin_value/t0)
-        !else
-        !    theta_min=pi/2d0
-        !end if
-        !n=gxj_ir%ny
-        !y(1:n)=gxj_ir%fxy(i,1:n)
-        !call spline_mylib(gxj_ir%ycenter(1:n),y(1:n),n,yp1,ypn, y2(1:n))
-        logt0=log10(t0)
-        if(logt0>log10jmin_value)then
-            if(logt0<log10jmax_value)then
-                call return_idx(logt0, log10jmin_value,log10jmax_value,gxj_ir%ny,idx,0)
-            else
-                idx=gxj_ir%ny
-            end if
-            !print*, "gxj_ir%yb=",gxj_ir%ycenter
-            !print*, "t0,log10(t0),idx=",t0,log10(t0),idx
-            
-            do j=1, idx-1
-                jx0=10**(gxj_ir%ycenter(j)-gxj_ir%ystep/2d0)
-                !jmid=10**gxj_ir%ycenter(j)
-                jx1=10**(gxj_ir%ycenter(j)+gxj_ir%ystep/2d0)
-                sintheta1=jx1/t0
-                sintheta0=jx0/t0
-                !theta1=asin(jx1/t0)
-                !theta0=asin(jx0/t0)
-                costheta1=(1-sintheta1*sintheta1)**0.5
-                costheta0=(1-sintheta0*sintheta0)**0.5
-                gxr%fx(i)=gxr%fx(i)+&
-                gxj_ir%fxy(i,j)*(costheta0-costheta1)
-                !gxj_ir%fxy(i,j)*(cos(theta0)-cos(theta1))
-
-            end do
-            jx0=10**(gxj_ir%ycenter(idx)-gxj_ir%ystep/2d0)
-            !jmid=10**((gxj_ir%ycenter(idx)-gxj_ir%ystep/2d0+log10(t0))/2d0)
-            !print*, "jx0,jx1, logt0=",jx0, jx1, log10(t0)
-            !print*, "t0, log(t0), jx0,jx1,ystep=",t0, log10(t0),jx0,jx1, gxj_ir%ystep
-            !theta1=pi/2d0
-            !theta0=asin(jx0/t0)
-            sintheta0=jx0/t0
-            costheta0=(1-sintheta0*sintheta0)**0.5
-            !print*, "theta0,theta1=",theta0,theta1
-            gxr%fx(i)=gxr%fx(i)+gxj_ir%fxy(i,idx)*costheta0!jmid/t0*(theta1-theta0)
-            !print*, "gxr=", gxj_ir%fxy(i,idx)*jx1*(theta1-theta0)
-            !read(*,*)
-            !do j=1, idx-1
-            !    theta=(theta_max-theta_min)/dble(nbin_size)*(j-0.5)+theta_min
-            !    jx=sin(theta)
-            !    call return_idx(log10(jx*t0), log10jmin_value,log10jmax_value,gxj_ir%ny,idx,0)
-            !    gxr%fx(i)=gxr%fx(i)+gxj_ir%fxy(i,idx)*jx*pi/2d0/dble(nbin_size)
-                !if(idx<0)then
-                !    print*, "jmin,jmax=",jmin_value,jmax_value
-                !    print*, "theta_min,max=",theta_min,theta_max
-                !    print*, "jx,t0=",jx,t0
-                !    print*, "log10(jx*t0),idx=",log10(jx*t0), idx
-                !    stop
-                !end if
-                !if(gxj_ir%ycenter(j)-gxj_ir%ystep/2d0<t0)then
-                !    gxr%fx(i)=gxr%fx(i)+&
-                !    gxj_ir%fxy(i,j)*jx*pi/2d0/dble(nbin_size)
-                !end if
-                !call splint_mylib(gxj_ir%ycenter(1:n),y(1:n),y2(1:n),n,log10(jx*t0), yout,ier)
-                !call linear_int(gxj_ir%ycenter(1:n),y(1:n),n, log10(jx*t0), yout)
-                !gxr%fx(i)=gxr%fx(i)+max(yout,0d0)*jx*pi/2d0/dble(nbin_size)
-            !end do
-            !print*, "ex,gx0, gx1=", ex,dm%mb(1)%star%barge_ir%fx(i), common_gx_ir%fx(i)
-            !read(*,*)
-        else
-            if(logt0<=log10jmin_value)then
-                gxr%fx(i)=0
-            !else
-            !    print*, "logt0??=",logt0, log10jmax_value
-            !    stop
-            end if
-        end if
-    end do
-end subroutine
+ 
 subroutine get_gxr(gxr,gxj_ir,logr,spp,dm,jc_pre)
     use com_main_gw
     implicit none
@@ -396,76 +272,9 @@ subroutine get_gxr(gxr,gxj_ir,logr,spp,dm,jc_pre)
         end if
         !read(*,*)
     end do
-	
-
+	 
 end subroutine
-
-subroutine get_barge_stellar_2d(so,jbtype)
-    use md_dms
-    implicit none
-    type(dms_stellar_object)::so
-    !real(8) sums
-    integer i, j, idid, jbtype
-    real(8) x,int_out
-    if(so%n.eq.0)return
-    do i=1, so%barge%nbin
-        int_out=0
-        !print*,"xmax=",mb%barge%xmax
-        if(so%barge%nbin.ne.so%gxj%nx)then
-            print*, "error! barge%nbin should = gxj%nx"
-            stop
-        end if
-        so%barge%xb(i)=so%gxj%xcenter(i)
-        select case(jbtype)
-        case (Jbin_type_lin)
-            do j=1, so%gxj%ny
-                !==original==
-                int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep*2d0
-                !===test=====
-                !int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep&
-                !    /(1-so%gxj%ycenter(j)**2)**0.5d0
-            end do
-            so%barge%fx(i)=int_out
-            !so%barge%nsam=so%n
-            if(ieee_is_nan(so%barge%fx(i)))then
-                print*, "get_barge_stellar:fx is NaN:", int_out
-                call so%gxj%print()
-                read(*,*)
-            end if
-        case(Jbin_type_log)
-            do j=1, so%gxj%ny
-                !==original==
-                int_out=int_out+so%gxj%fxy(i,j)*(10**so%gxj%ycenter(j))**2*so%gxj%ystep*2d0*log(10d0)
-                !===test=====
-                !int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep&
-                !    /(1-so%gxj%ycenter(j)**2)**0.5d0
-            end do
-            so%barge%fx(i)=int_out
-            !so%barge%nsam=so%n
-            if(ieee_is_nan(so%barge%fx(i)))then
-                print*, "get_barge_stellar:fx is NaN:", int_out
-                call so%gxj%print()
-                read(*,*)
-            end if
-        case(Jbin_type_sqr)
-            do j=1, so%gxj%ny
-                !==original==
-                int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep*2d0
-                !===test=====
-                !int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep&
-                !    /(1-so%gxj%ycenter(j)**2)**0.5d0
-            end do
-            so%barge%fx(i)=int_out
-            !so%barge%nsam=so%n
-            if(ieee_is_nan(so%barge%fx(i)))then
-                print*, "get_barge_stellar:fx is NaN:", int_out
-                call so%gxj%print()
-                read(*,*)
-            end if
-        end select	
-    end do
-    call so%barge%prepare_spline()
-end subroutine
+ 
 
 subroutine get_barge_stellar_2d_ir(so,jbtype)
     use md_dms
@@ -485,31 +294,13 @@ subroutine get_barge_stellar_2d_ir(so,jbtype)
         end if
         so%barge_ir%xb(i)=so%gxj_ir%xcenter(i)
         select case(jbtype)
-        case (Jbin_type_lin)
-            do j=1, so%gxj_ir%ny
-                !==original==
-                int_out=int_out+so%gxj_ir%fxy(i,j)*so%gxj_ir%ycenter(j)*so%gxj_ir%ystep*2d0
-                !===test=====
-                !int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep&
-                !    /(1-so%gxj%ycenter(j)**2)**0.5d0
-            end do
-            so%barge_ir%fx(i)=int_out
-            !so%barge%nsam=so%n
-            if(ieee_is_nan(so%barge_ir%fx(i)))then
-                print*, "get_barge_stellar:Jbin_type_lin:fx is NaN:", int_out
-                call so%gxj_ir%print()
-                read(*,*)
-            end if
+ 
         case(Jbin_type_log)
             !print*, "i=",i
             do j=1, so%gxj_ir%ny
                 !==original==
                 int_out=int_out+so%gxj_ir%fxy(i,j)*(10**so%gxj_ir%ycenter(j))**2*&
-                    so%nxj_ir%ysteps(j)*2d0*log(10d0)
-               ! print*, "so%gxj_ir%fxy(i,j)=",so%gxj_ir%fxy(i,j)
-                !===test=====
-                !int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep&
-                !    /(1-so%gxj%ycenter(j)**2)**0.5d0
+                    so%nxj_ir%ysteps(j)*2d0*log(10d0) 
             end do
             !print*, "int_out=",int_out 
             so%barge_ir%fx(i)=int_out
@@ -520,21 +311,7 @@ subroutine get_barge_stellar_2d_ir(so,jbtype)
                 call so%gxj_ir%print()
                 read(*,*)
             end if
-        case(Jbin_type_sqr)
-            do j=1, so%gxj%ny
-                !==original==
-                int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep*2d0
-                !===test=====
-                !int_out=int_out+so%gxj%fxy(i,j)*so%gxj%ycenter(j)*so%gxj%ystep&
-                !    /(1-so%gxj%ycenter(j)**2)**0.5d0
-            end do
-            so%barge%fx(i)=int_out
-            !so%barge%nsam=so%n
-            if(ieee_is_nan(so%barge%fx(i)))then
-                print*, "get_barge_stellar:fx is NaN:", int_out
-                call so%gxj%print()
-                read(*,*)
-            end if
+         
         end select	
     end do
     !call so%barge_ir%print("barge_ir")
@@ -554,9 +331,7 @@ subroutine dms_so_get_fxj_spt_ir(so, n0, pd,jc, r0,jbtype)
     real(8) jc_xy,rp_xy,ra_xy,pd_xy
 
     if(so%n.eq.0) return
-    select case(jbtype)
-    case(Jbin_type_lin)
-
+    select case(jbtype) 
     case(Jbin_type_log)
         do i=1, so%nxj_ir%nx
             x=10**so%nxj_ir%xcenter(i)
@@ -587,11 +362,7 @@ subroutine dms_so_get_fxj_spt_ir(so, n0, pd,jc, r0,jbtype)
                 !read(*, *)
                 
             end do 
-        end do
-        !call so%gxj_ir%print("gxj_ir")
-        !read(*,*)
-    case(Jbin_type_sqr)
-
+        end do 
     case default
         print*, "fxj error!"
         stop

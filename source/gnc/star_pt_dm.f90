@@ -5,20 +5,10 @@ subroutine get_spp_fma(spp)
 	implicit none 
 	!type(diffuse_mspec)::dm
 	type(star_pot_para)::spp
-	integer i
-	!logical::patch_outside
-	!type(sts_fc_type)::frho_tot
+	integer i 
 	
-	spp%fma_star%fx=0
-	!if(spp%fma_star%nbin.ne.spp%frho_star%nbin)then
-	!	print*, "error! dms%fma_star%nbin.ne.dms%all%all%fmden%nbin", spp%fma_star%nbin, spp%frho_star%nbin
-	!	stop
-	!end if
-	call get_fma_tot(spp%fma_star,sample_logrmin,spp)
-	!call spp%fma_star%print("fma_star")
-	!stop
-	!call get_beta_full_range(dms%fma_star,dms%fma_star%xmax, &
-	!	M_r_within_max)
+	spp%fma_star%fx=0 
+	call get_fma_tot(spp%fma_star,sample_logrmin,spp) 
 	call get_fma_tot_one(sample_logrmax,sample_logrmin,spp%M_r_within_max,spp)
 
 
@@ -38,17 +28,11 @@ subroutine get_fna_tot_one(spp)
 	do i=1, dms%n
 		call dms%mb(i)%all%fna%get_value_s(sample_logrmax,nr)
 		n_cum=n_cum+nr
-		!print*, "i=",i
-		!if(rid.eq.0)then
-		!	call dms%mb(i)%all%fna%print('fna')
-		!	print*, "nr=", nr, n_cum
-		!end if
+		!print*, "i=",i 
 	end do
 
 	spp%N_r_within_max=n_cum
-	
-	!print*, "n_cum=", n_cum, spp_new%M_r_within_max
-	!read(*,*)
+	 
 end subroutine
 subroutine get_fma_tot_one(xb,rmin,fx, spp)
 	use my_intgl
@@ -62,17 +46,10 @@ subroutine get_fma_tot_one(xb,rmin,fx, spp)
 	type(star_pot_para)::spp
 	integer idid
 	real(8) rmin, yout,radius,xb, fx
-	integer i
-	!logical::patch_outside
-
-	!rmin=frho%xb(1)-2; 
-	!rmin=sample_logrmin
-
+	integer i 
 	yout=0
 	call my_integral_acc(rmin,xb,yout,fr_funcs_int_acc_a,fr_funcs_int_acc_r,FCN, idid)
-	fx=yout*4*pi*log(10d0)+10**(rmin*3)/3d0*spp%spt_rho_rmin*4*pi
-	!if(yout<0)print*, "yout=",yout
-	!print*, "xb,fx=",xb,fx,yout, 10**(rmin*3)/3d0*spt_rho_rmin*4*pi
+	fx=yout*4*pi*log(10d0)+10**(rmin*3)/3d0*spp%spt_rho_rmin*4*pi 
 contains 
 	subroutine FCN(N,X,Y,F,IPAR,RPAR)
 		implicit none
@@ -107,16 +84,11 @@ end subroutine
 subroutine get_spp_starpt_one(xb, fx, spp)
 	use com_main_gw
 	use md_star_pot
-	implicit none
-	!type(diffuse_mspec)::dm
-	!type(s1d_type)::frho_star
-	type(star_pot_para)::spp
-	!call get_starpt(fphi_star%fx,fphi_star%nbin, frho_star%fx,frho_star%nbin, fphi_star%xb&
-	!	, ctl%n0,ctl%v0, r0_cl)
+	implicit none 
+	type(star_pot_para)::spp 
 	real(8) rmin, rmax, xb, fx
 	real(8) logradius,radius,mtot
-	integer i,idid,ier
-	!logical::patch_outside
+	integer i,idid,ier 
 
 	call check_spp_data(spp,ier)
 	if(ier<0)then
@@ -124,13 +96,11 @@ subroutine get_spp_starpt_one(xb, fx, spp)
 		stop
 	end if
 
-	rmin=sample_logrmin; rmax=sample_logrmax
-	!spt_rho_rmin=frho_star%fx(1)
+	rmin=sample_logrmin; rmax=sample_logrmax 
 
 	fx=0
 	logradius=xb
-	radius=10**xb
-	!print*, "star starpot", spp%spt_rho_rmin
+	radius=10**xb 
 	
 	call my_integral_acc(rmin,rmax,fx,fr_funcs_int_acc_a,fr_funcs_int_acc_r,FCN, idid)
 	fx=fx*4*pi*log(10d0)+spp%spt_rho_rmin*10**(sample_logrmin*3)/3d0/radius*4*pi
@@ -147,19 +117,14 @@ contains
 			F(1)=ysp * (10**X)**3/radius
 		else
 			F(1)=ysp* (10**X)**2
-		end if
-		!print*, "X,F=",X, F(1)
+		end if 
 	end subroutine
 end subroutine
 subroutine get_spp_starpt(spp)
 	use com_main_gw
 	use md_star_pot
-	implicit none
-	!type(diffuse_mspec)::dm
-	type(star_pot_para)::spp
-	!type(s1d_type)::fphi_star, frho_star
-	!call get_starpt(fphi_star%fx,fphi_star%nbin, frho_star%fx,frho_star%nbin, fphi_star%xb&
-	!	, ctl%n0,ctl%v0, r0_cl)
+	implicit none 
+	type(star_pot_para)::spp 
 	real(8) logradius,radius,mtot,fout
 	integer i,idid,ier
 	
@@ -176,21 +141,13 @@ subroutine get_spp_starpt(spp)
 				if(fphi_star%fx(i)<fphi_star%fx(i+1))then
 					fphi_star%fx(i)=fphi_star%fx(i+1)+1d-11
 				end if
-			end if
-			!print*, "logr, phi=", logradius(i), phi_star(i)
+			end if 
 		enddo
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
 			fphi_star%fx=log10(fphi_star%fx) !-phi_star(nbin)
 		end select 
-	end associate
-
-	!call spp%fphi_star%print("1 phi")
-	!do i=1, spp%fphi_star%nbin
-	!	call get_spp_starpt_one_2(spp%fphi_star%xb(i),spp%fphi_star%fx(i),spp)
-	!end do
-	!call spp%fphi_star%print("2 phi")
-	!read(*,*)
+	end associate 
 end subroutine
 subroutine get_spt_phi_constants(spp)
 	use md_star_pot
@@ -209,37 +166,14 @@ subroutine get_spt_phi_constants(spp)
 	rmin=spp%frho_star%xmin; rmax=spp%frho_star%xmax
 	fx=0
 	call my_integral_acc(rmin,rmax,fx,fr_funcs_int_acc_a,fr_funcs_int_acc_r,FCN, idid)
-	spp%phi_r1r2_s=fx*4*pi*log(10d0)
-	!real_rmin=10**rmin
-	!if(spp%phi_r1r2_s+spp%spt_rho_rmin*(10**(rmin*2)*3-real_rmin**2)*4*pi/6d0<10**sample_logemax&
-	!	.and.spp%mbh_dmless.eq.0)then
-	!	if(rid.eq.0)then
-	!		print*, "spp%phi_r1r2_s, cor,sample_emax=",spp%phi_r1r2_s, &
-	!		10**sample_logemax-(10**(rmin*2)*3-real_rmin**2)*4*pi/6d0*spp%spt_rho_rmin,sample_emax
-	!	end if
-	!	spp%phi_r1r2_s=10**sample_logemax-(10**(rmin*2)*3-real_rmin**2)*4*pi/6d0*spp%spt_rho_rmin
-	!end if
+	spp%phi_r1r2_s=fx*4*pi*log(10d0) 
 	fx=0
-	!call spp%frho_star%print('frho')
-	!call dms%all%all%barge_ir%print("barge")
-	!print*, "rho_min=",spp%spt_rho_rmin
+ 
 	call my_integral_acc(rmin,rmax,fx,fr_funcs_int_acc_a,fr_funcs_int_acc_r,FCN2, idid)
 	spp%phi_r1r2_s2=fx*4*pi*log(10d0)
 
 	spp%phi_star0=spp%phi_r1r2_s+0.5d0*10**(rmin*2)*spp%spt_rho_rmin
-	!print*, "s2=",spp%phi_r1r2_s2
-	!read(*,*)
-	!if ((spt_rho_rmin*4*pi*10**(dms%fphi_star%xmin*3)/3d0+phi_r1r2_s2)/10**dms%fphi_star%xb(dms%fphi_star%nbin)&
-	!	<dms%fphi_star%fx(dms%fphi_star%nbin))then
-	!		print*, (spt_rho_rmin*4*pi*10**(dms%fphi_star%xmin*3)/3d0+phi_r1r2_s2)&
-	!		/10**10**dms%fphi_star%xb(dms%fphi_star%nbin), dms%fphi_star%fx(dms%fphi_star%nbin)
-	!		stop
-	!end if
-	!if(rid.eq.0)then
-	!	print*, "phi_r1r2_s2=",phi_r1r2_s2
-	!end if
-	!print*, "phi_r1r2_s2=",spp%phi_r1r2_s2, ctl%plummer_model_mtot*(10**(rmax*3)/(10**(rmax*2)+1d0)**1.5&
-	!	-10**(rmin*3)/(10**(rmin*2)+1d0)**1.5)
+	!print*, "s2=",spp%phi_r1r2_s2 
 contains 
 	subroutine FCN(N,X,Y,F,IPAR,RPAR)
 		implicit none
@@ -277,7 +211,7 @@ subroutine get_jc_dmless(jcdm, rc, spp)
 	implicit none
 	type(s1d_type)::jcdm, rc
 	type(star_pot_para)::spp
-	real(8) r_c, jc_dmless
+	real(8) jc_dmless
 	integer i
 	if(jcdm%nbin.ne.rc%nbin) then
 		print*, "error! jdcm%nbin /= rc%nbin"
@@ -336,9 +270,7 @@ subroutine get_dehnen_fe(fe_theory, gamma, ra, mtot)
 		do i=1, fe_theory%nbin			
 			select case(ctl%ebin_type)
 			case(ebin_type_log)
-				x=eta*10**fe_theory%xb(i)
-			case(ebin_type_lin)
-				x=eta*fe_theory%xb(i)
+				x=eta*10**fe_theory%xb(i) 
 			end select
 			fe_theory%fx(i)=2**0.5*3*eta**0.5/pi**1.5d0/ra**2*((2*x)**0.5*(3-4*x)/(1-2*x)-3*asinh((2*x/(1-2*x))**0.5) )
 		end do
@@ -349,9 +281,7 @@ subroutine get_dehnen_fe(fe_theory, gamma, ra, mtot)
 		do i=1, fe_theory%nbin			
 			select case(ctl%ebin_type)
 			case(ebin_type_log)
-				x=eta*10**fe_theory%xb(i)
-			case(ebin_type_lin)
-				x=eta*fe_theory%xb(i)
+				x=eta*10**fe_theory%xb(i) 
 			end select
 			fe_theory%fx(i)=2**(-2d0)*eta**0.5/pi**1.5d0/ra**2/(1-x)**2.5*(3*asin(x**0.5)-(x*(1-x))**0.5*(3+2*x-24*x**2+16*x**3))
 		end do
@@ -375,10 +305,7 @@ subroutine get_plummer_fe(fe_theory, ra, mtot)
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
 			xmin=10**fe_theory%xb(fe_theory%nbin)
-			x=10**fe_theory%xb(i)
-		case(ebin_type_lin)
-			xmin=fe_theory%xb(fe_theory%nbin)
-			x=fe_theory%xb(i)
+			x=10**fe_theory%xb(i) 
 		end select
 		fe_theory%fx(i)=24d0*2**0.5*ra**2*x**3.5d0/7d0/pi**3/mtot**4*(2*pi)**1.5d0
 	end do
@@ -406,7 +333,7 @@ subroutine get_nx(nx,gx,rmax,  mbhin,spp)
 	use constant
 	use my_intgl
 	use model_basic,only:ctl
-	use md_coeff,only:ebin_type_log,ebin_type_lin
+	use md_coeff,only:ebin_type_log
 	use md_star_pot
 	implicit none
 	type(s1d_type)::nx, gx,  fphi_star, barp
@@ -432,18 +359,7 @@ subroutine get_nx(nx,gx,rmax,  mbhin,spp)
 			else
 				nx%fx(i)=-100
 			end if
-		end do
-		! call gx%print("gx")
-		! call nx%print("nx")
-		! read(*,*)
-	case(ebin_type_lin)
-		call get_barp_xy(log10(barp%xb), barp%fx,barp%nbin,rmax,mbhin,spp)
-		do i=1, nx%nbin
-			fout=0
-			nx%fx(i)=2**1.5d0*pi**(0.5d0)*gx%fx(i)*barp%fx(i)
-			!print*, "nx%fx(i)=", nx%xb(i), nx%fx(i), gx%fx(i), fout
-			!read(*,*)
-		end do
+		end do 
 	end select
 
 	
@@ -474,9 +390,7 @@ subroutine get_pd_dmless_mpi(spp,jc_dm_less,rp_dm,ra_dm,pd_dm_less)
 		do j=ibg, ied
 			select case(ctl%ebin_type)
 			case(ebin_type_log)
-				enx=10**pd_dm_less%xcenter(i)
-			case(ebin_type_lin)
-				enx=pd_dm_less%xcenter(i)
+				enx=10**pd_dm_less%xcenter(i) 
 			end select
 			jm=10**pd_dm_less%ycenter(j)
 			jc=jc_dm_less%fx(i)
@@ -489,8 +403,6 @@ subroutine get_pd_dmless_mpi(spp,jc_dm_less,rp_dm,ra_dm,pd_dm_less)
 	end do
 	call mpi_barrier(mpi_comm_world,ierr)
 	call collect_data_mpi_x(pd_dm_less%fxy,pd_dm_less%nx,ibg,ied,pd_dm_less%nx/ctl%ntasks,ctl%ntasks)
-	!call cpu_time(t2)
-	!print*, "mpi,period,t=",t2-t1,rid
 
 end subroutine
 
@@ -518,9 +430,7 @@ subroutine get_pd_dmless(spp,jc_dm_less,rp_dm,ra_dm,pd_dm_less)
 			!j=42
 			select case(ctl%ebin_type)
 			case(ebin_type_log)
-				enx=10**pd_dm_less%xcenter(i)
-			case(ebin_type_lin)
-				enx=pd_dm_less%xcenter(i)
+				enx=10**pd_dm_less%xcenter(i) 
 			end select
 			jm=10**pd_dm_less%ycenter(j)
 			jc=jc_dm_less%fx(i)
@@ -562,9 +472,7 @@ subroutine get_rp_ra_dm(spp, jc_dm, rc, rmax, rp,ra )
 	do i=1, rp%nx
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			enx=10**rp%xcenter(i)
-		case(ebin_type_lin)
-			enx=rp%xcenter(i)
+			enx=10**rp%xcenter(i) 
 		end select
 		!call cpu_time(t1)
 		!do j=1,100
@@ -609,9 +517,7 @@ subroutine get_rp_ra_dm_mpi(spp, jc_dm, rc, rmax, rp,ra )
 	do i=1, rp%nx 
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			enx=10**rp%xcenter(i)
-		case(ebin_type_lin)
-			enx=rp%xcenter(i)
+			enx=10**rp%xcenter(i) 
 		end select
 		call get_rmax_accurate(spp,rmax,rp%xcenter(i),logrmax_tmp)
 		!end do
@@ -650,9 +556,7 @@ end subroutine
 
 
 subroutine get_frphi(phi_star,  rmax)
-	use com_main_gw
-	!use coms_sts_type
-	!use model_basic:only:dms,ctl,ebin_type_log,ebin_type_lin
+	use com_main_gw 
 	implicit none 
 	type(s1d_type)::phi_tot_sorted, rmax, phi_star, frho_star
 	real(8) phi_out, fx(phi_star%nbin)
@@ -671,11 +575,7 @@ subroutine get_frphi(phi_star,  rmax)
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
 			rmax%xb(i)=fx(rmax%nbin-i+1)
-			rmax%fx(i)=phi_star%xb(rmax%nbin-i+1)
-		case(ebin_type_lin)
-!			call get_rmax_accurate(phi_star,phi_tot_sorted,log10(rmax%xb(i)),rmax%fx(i))
-			print*, "get_rmax:finish the code"
-			stop
+			rmax%fx(i)=phi_star%xb(rmax%nbin-i+1) 
 		end select
 	end do
 	do i=2, rmax%nbin
@@ -746,85 +646,33 @@ subroutine get_rmax_accurate(spp,  fr_phi, logex, rmax)
 
 	!call fr_phi%print("fr_phi")
 	!read(*,*)
-	ex=10**logex
-	!select case(ctl%ebin_type)
-	!case(ebin_type_log)
-		if(logex.ge.log10emax_factor.and.spp%mbh_dmless.eq.0) then
-			rmax=ctl%log10rmin_factor
-			!print*, "get_rmax_accurate:ex, emax_factor=",ex,emax_factor
+	ex=10**logex 
+	if(logex.ge.log10emax_factor.and.spp%mbh_dmless.eq.0) then
+		rmax=ctl%log10rmin_factor
+		!print*, "get_rmax_accurate:ex, emax_factor=",ex,emax_factor
+		return
+	end if
+		 
+	if(logex.gt.sample_logemax.and.spp%mbh_dmless.ne.0.and.spp%spt_rho_rmin>0)then
+		if(10**logex-2*pi*spp%spt_rho_rmin*10**(sample_logrmin*2)-spp%phi_r1r2_s>0)then
+			call get_rmax_r_le_r1(spp,logex,rmax)
 			return
-		end if
-		
-		!if(logex.le.log10emin_factor) then
-		!	rmax=ctl%log10rmax_factor
-			!print*, "get_rmax_accurate:ex, emax_factor=",ex,emax_factor
-		!	return
-		!end if
-		!if(logex.le.log10emin_factor)		
-		!logex=8d0
-		!print*, "true_log10emax_factor=",true_log10emax_factor
-		if(logex.gt.sample_logemax.and.spp%mbh_dmless.ne.0.and.spp%spt_rho_rmin>0)then
-			if(10**logex-2*pi*spp%spt_rho_rmin*10**(sample_logrmin*2)-spp%phi_r1r2_s>0)then
-				call get_rmax_r_le_r1(spp,logex,rmax)
-				return
-			end if			
-		end if
-		call fr_phi%get_value_l(logex,rmax0)
-		!if(logex>1e-4)then
-		!	print*, "rmax0=",rmax0
-		!end if
-	!case(ebin_type_lin)
-
-	!	if(ex>emax_factor) then
-	!		!print*, "get_rmax_accurate:ex, emax_factor=",ex,emax_factor
-	!		rmax=dms%logrmin
-	!		return
-	!	end if
-	!	call fr_phi%get_value_l(ex,rmax0)
-	!case default
-	!	print*, "error in rmax 0", ctl%ebin_type
-	!	stop
-	!end select
+		end if			
+	end if
+	call fr_phi%get_value_l(logex,rmax0)
+	 
 	require_acc=1d-13
 
 	if(spp%mbh_dmless.ne.0)then
-		!call get_phi_star_full_range(fphi_star,logex,phi_star_tmp)
-		!if(10**phi_star_tmp<mbh_dmless/10**rmax0*1d-5)then
-		!	rmax=log10(mbh_dmless/(ex-10**phi_star_tmp))
-		!	print*, "rmax=",rmax
-		!	!return 
-		!	ctl%debug=1
-		!end if
+		 
 		require_acc=1d-11
 	end if
-
-	!print*, "logex,rmax0=",logex, rmax0
-	
-	!if(mbh_dmless.eq.0.and.ex>fphi_star%fx(fphi_star%nbin))then
-	!	rmax=fphi_star%xb(1)
-	!	return
-	!end if
-	!print*, "start"
+ 
 	width=0.1d0
 	!if(mbh_dmless.ne.0)then
 100		xl=rmax0-width
 		xh=rmax0+width
-	!else
-	!	xl=max(rmax0-width,dms%logrmin)
-	!	xh=min(rmax0+width,dms%logrmax)
-	!	if(func(xl,par).eq.0)then
-	!		rmax=xl
-	!		return
-	!	end if
-	!	if(func(xh,par).eq.0)then
-	!		rmax=xh
-	!		return
-	!	end if
-	!end if
-	
-	!if(logex>1e-4)then
-	!	print*, "xl,xh,rmax0=",xl,xh,rmax0, func(xl,par),func(xh,par)
-	!end if
+	 
 	rmax=rtbis_yacc(func,xl,xh,require_acc,par,niter,500,ier,.true.) 
 
 	if(ier.eq.1)then
@@ -836,12 +684,7 @@ subroutine get_rmax_accurate(spp,  fr_phi, logex, rmax)
 			require_acc=require_acc*2
 			nmax_iter=nmax_iter-1
 			rmax0=rmax
-
-			!print*, "xl,xh,width,nmax_iter=",xl,xh,width,nmax_iter,rmax
-			!print*, "fl,fh=",func(xl,par),func(xh,par)
-			!print*, "xmid,dx, require_acc=",rmax0,par(50), require_acc
-			!print*, "fx,fx2=",func(rmax0,par), func(rmax0+par(50),par), func(rmax0-par(50),par)
-			!read(*,*)
+ 
 			if(abs(par(50)/rmax0)>1d-15)then
 				goto 100
 			else
@@ -872,21 +715,7 @@ subroutine get_rmax_accurate(spp,  fr_phi, logex, rmax)
 		call error_handle()
 		stop
 	end if
-	!print*, "ier=",ier
-	!stop
-
-	!if(ctl%debug.eq.1)then
-	!	print*, "rmax=",rmax
-	!	read(*,*)
-	!end if
-	!print*, "ex,rmax=",ex,logex,rmax,func(rmax,par)
-	!block
-	!	real(8) phi_out
-	!	call get_phi_star_full_range(fphi_star,rmax,phi_out)
-	!	print*, "phi_out=",phi_out,phi_out-logex,require_acc
-	!end block
-	!stop
-	!read(*,*)
+	 
 contains 
 	real(8) function func(x,par)
 		implicit none
@@ -897,9 +726,7 @@ contains
 		!print*, "x, phi_star=",x,phi_star
 		select case(ctl%ebin_type)
 		case(ebin_type_log)
-			phi_star_tmp=10**phi_star
-		case(ebin_type_lin)
-			phi_star_tmp=phi_star
+			phi_star_tmp=10**phi_star 
 		case default
 			print*, "error in rmax"
 			stop

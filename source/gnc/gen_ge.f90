@@ -118,33 +118,18 @@ subroutine get_ge(dm, sms_arr_single)
     implicit none
     type(diffuse_mspec)::dm
     type(particle_samples_arr_type)::sms_arr_single
-    type(particle_samples_arr_type)::sms_arr_stellar_sg(n_tot_comp_sg)
-     
+    type(particle_samples_arr_type)::sms_arr_stellar_sg(n_tot_comp_sg)     
     logical::norm_in
     if(rid.eq.0)then
         print*, "get ge"
     end if
-    call separate_to_species(sms_arr_single, sms_arr_stellar_sg)
-    !print*, "1"
-    !print*, "gen_ge:n_star, nsbh=", sms_arr_star%n, sms_arr_sbh%n
+    call separate_to_species(sms_arr_single, sms_arr_stellar_sg) 
     call init_diffuse_mspec_gxtables(dm)
-    
-    !call gen_nxj_fxj_gx(dm, sms_arr_star, sms_arr_bystar, sms_arr_sbh, sms_arr_wd, &
-	!	sms_arr_ns,sms_arr_bd, sms_arr_bbh,norm_in)
-   ! print*, "2"
+     
     call conv_dms_nejw(dm, sms_arr_stellar_sg)        
     call get_dms_particle_numbers(dm)
     call update_asymptot(dm)
-    
-    ! if(rid.eq.0)then
-    !     call print_norm_dms(dms,chatterY_out_unit)
-    !     !call print_num_boundary(dms)
-    !     !call print_num_boundary(dms)
-    !     call print_num_all(dms)
-    !     read(*,*)
-    ! end if
-     
-
+      
     if(ctl%include_stellar_evolution.ge.1)then
         
         call get_mass_distributions(dm,sms_arr_single)
@@ -161,26 +146,17 @@ subroutine get_dms_particle_numbers(dm)
     use com_main_gw
     implicit none
     type(diffuse_mspec)::dm
-    integer i,j
-    ! do j=1, n_tot_comp
-    !     dm%all%dsp(j)%p%n=0
-    !     dm%all%dsp(j)%p%n_real=0
-    ! end do
+    integer i,j 
     
     do i=1, dm%n
         dm%mb(i)%all%n_real=0
         dm%mb(i)%all%n=0
         do j=1, n_tot_comp
             dm%mb(i)%all%n_real=dm%mb(i)%all%n_real+dm%mb(i)%dsp(j)%p%n_real
-            dm%mb(i)%all%n=dm%mb(i)%all%n+dm%mb(i)%dsp(j)%p%n
-            ! dm%all%dsp(j)%p%n=dm%all%dsp(j)%p%n+dm%mb(i)%dsp(j)%p%n
-            ! dm%all%dsp(j)%p%n_real=dm%all%dsp(j)%p%n_real+dm%mb(i)%dsp(j)%p%n_real
+            dm%mb(i)%all%n=dm%mb(i)%all%n+dm%mb(i)%dsp(j)%p%n 
         end do
         dm%all%all%n=dm%all%all%n+dm%mb(i)%all%n
-    end do    
-    ! do i=1, n_tot_comp
-    !     print*, "i,dm%all%dsp(i)=", i, dm%all%dsp(i)%p%n, dm%all%dsp(i)%p%n_real
-    ! end do
+    end do     
 
 end subroutine
 subroutine update_asymptot(dm)
@@ -262,17 +238,7 @@ subroutine get_mass_distributions(dm,sams)
     type(diffuse_mspec)::dm
     type(particle_samples_arr_type)::sams
     integer i
-    real(8) m1, m2
-    !real(8) m1(n_tot_comp_sg), m2(n_tot_comp_sg)
-    !real(8) mcollect(2*n_tot_comp_sg)
-
-    ! do i=1, n_tot_comp_sg
-    !     m1(i)=minval(dm%all%dsp(i)%p%nejw%m(:))
-    !     m2(i)=maxval(dm%all%dsp(i)%p%nejw%m(:))
-    !     !mcollect(i*2-1:i*2)=(/m1(i),m2(i)/)
-    ! end do
-    ! call collection_and_get_min_fx(m1, n_tot_comp_sg)
-    ! call collection_and_get_max_fx(m2, n_tot_comp_sg)
+    real(8) m1, m2 
     m1=minval(sams%sp(:)%m)
     m2=maxval(sams%sp(:)%m)
     !print*, "m1,m2=",m1,m2,rid
@@ -323,17 +289,7 @@ subroutine get_rad_distributions(dm,sams)
     type(diffuse_mspec)::dm
     type(particle_samples_arr_type)::sams
     integer i
-    real(8) r1, r2
-    !real(8) m1(n_tot_comp_sg), m2(n_tot_comp_sg)
-    !real(8) mcollect(2*n_tot_comp_sg)
-
-    ! do i=1, n_tot_comp_sg
-    !     m1(i)=minval(dm%all%dsp(i)%p%nejw%m(:))
-    !     m2(i)=maxval(dm%all%dsp(i)%p%nejw%m(:))
-    !     !mcollect(i*2-1:i*2)=(/m1(i),m2(i)/)
-    ! end do
-    ! call collection_and_get_min_fx(m1, n_tot_comp_sg)
-    ! call collection_and_get_max_fx(m2, n_tot_comp_sg)
+    real(8) r1, r2 
     r1=minval(sams%sp(:)%byot%ms%radius)
     r2=maxval(sams%sp(:)%byot%ms%radius)
     !print*, "m1,m2=",m1,m2,rid
@@ -403,22 +359,13 @@ subroutine set_jm_bound(jm)
         if(ctl%chattery.ge.3)then
             print*, "set_jm_bound: jm=", jm, " -> ", jmax_value
         end if
-        jm=jmax_value!*2-jm
-        !if(jm<0)then
-        !    print*, "af:jm=",jm
-        !    stop
-        !end if
+        jm=jmax_value!*2-jm 
         
     elseif(jm<jmin_value)then
         if(ctl%chattery.ge.3)then
             print*, "set_jm_bound: jm=", jm, " -> ", jmin_value*2-jm
-        end if
-        !print*, "jm=",jm, "->", jmin_value*2-jm
-        jm=jmin_value*2-jm
-        !if(jm<0)then
-        !    print*, "af:jm=",jm
-        !    stop
-        !end if
+        end if 
+        jm=jmin_value*2-jm 
     end if
     if(jm<jmin_value.or.jm>jmax_value) then
         niter=niter+1
@@ -521,63 +468,20 @@ subroutine dm_get_gxjcr_mpi(dm)
     use com_main_gw
     implicit none
     type(diffuse_mspec):: dm
-    integer i
-	!print*, "updating gxjcr", rid
-    do i=1, dm%n
-     !   print*, "i, m=", i, dm%mb(i)%mc
+    integer i 
+    do i=1, dm%n 
         call mb_get_gxjcr_mpi(dm%mb(i))
-    end do
-    !call get_dc0_bk(dm)
-!    call get_dc0(dm)
+    end do 
 
-end subroutine
-
-
-!subroutine get_steps_grid(dm,mi, dt)
-!	use com_main_gw
-!	implicit none
-!	type(diffuse_mspec)::dm
-!	type(s2d_type)::dt
-!	integer i, j,k, mi
-!	call dt%init(dm%df_coe_bins,dm%df_coe_bins,dm%logemin,dm%emax,dm%jmin, dm%jmax,sts_type_dstr)
-!	do i=1, dm%n
-!		do j=1, dm%df_coe_bins
-!			do k=1,dm%df_coe_bins
-!				
-!			end do
-!		end do
-!	end do
-!end subroutine
+end subroutine 
 subroutine set_dm_init(dm)
     use com_main_gw
     implicit none
     type(diffuse_mspec)::dm
     logical e_iregular
 
-    call dm%init(ctl%m_bins)
-    !select case(ctl%bin_mass_mode)
-    !case(bin_mass_mode_given)
-        
-	!print*, "11"
-    !case(bin_mass_mode_log_bin)
-    !   call set_mass_bin_mass_log(dm, ctl%bin_mass_min, ctl%bin_mass_max)
-    !case default
-    !    print*, "error!"
-    !end select
-   ! call init_grid_ctl()
-
- 
-!=======================================================
-
-    !print*, "emin, emax=", emin, emax
-   ! print*, "ctl%v0=", ctl%v0
-    !read(*,*)
-    !select case(ctl%barge_grid_type)
-    !case(barge_grid_type_iregular_barp,barge_grid_type_iregular_phi)
-        e_iregular=.true.
-    !case(barge_grid_type_regular)
-    !    e_iregular=.false.
-    !end select
+    call dm%init(ctl%m_bins) 
+	e_iregular=.true. 
     call dm%set_diffuse_mspec(ctl%diff_coeff_bins,ctl%dstr_bins_r,ctl%dstr_bins_e, &
         ctl%log10rmin_factor, ctl%log10rmax_factor, &
         jmin_value ,jmax_value, m0_cl,  ctl%v0, ctl%n0, r0_cl,ctl%x_boundary, &
@@ -611,7 +515,7 @@ subroutine get_ejw_from_particle(estar, jstar, wstar,rpstar,rastar,pdstar,jcstar
     mstar, radstar,n_star,  m1,  m2, mbh_in, v0, xb, nejw, nsam, nwsam)
     use md_stellar_object
     use model_basic,only:r0_cl,ctl
-    use md_coeff,only:ebin_type_lin,ebin_type_log
+    use md_coeff,only:ebin_type_log
     implicit none
     integer n_star
     real(8):: estar(n_star),jstar(n_star),wstar(n_star),mstar(n_star), xstar(n_star)
@@ -632,23 +536,14 @@ subroutine get_ejw_from_particle(estar, jstar, wstar,rpstar,rastar,pdstar,jcstar
     do i=1, nsam
         select case(ctl%ebin_type)
         case(ebin_type_log)
-            nejw(i)%e=log10(xstar(idx(i)))
-        case(ebin_type_lin)
-            nejw(i)%e=xstar(idx(i))
+            nejw(i)%e=log10(xstar(idx(i))) 
         end select
         if(ieee_is_nan(nejw(i)%e))then
             print*, "nejw=NaN:", estar(idx(i)), v0
             read(*,*)
         end if
-
-        !select case(jb_type)
-        !case(Jbin_type_lin)
-        nejw(i)%j=jstar(idx(i))!/jmax
-        !case(jbin_type_log)
-        !	nejw(i)%j=log10(jstar(idx(i)))!/jmax
-        !case(jbin_type_sqr)
-        !	nejw(i)%j=jstar(idx(i))**2
-        !end select
+ 
+        nejw(i)%j=jstar(idx(i))!/jmax 
         nejw(i)%rp=rpstar(idx(i))/r0_cl
         nejw(i)%ra=rastar(idx(i))/r0_cl
         nejw(i)%jc=jcstar(idx(i))/(v0*r0_cl)
@@ -663,23 +558,7 @@ subroutine get_ejw_from_particle(estar, jstar, wstar,rpstar,rastar,pdstar,jcstar
         end if
         nwsam=nwsam+wstar(idx(i))
     end do
-    !        nsam=0
-    !        do i=1, n_star
-    !            if(mstar(i).ge.m1.and.mstar(i).le.m2)then
-    !                nsam=nsam+1
-    !                nejw(nsam)%e=log10(abs(estar(i))/v0**2)
-    !                if(ieee_is_nan(nejw(nsam)%e))then
-    !                    print*, "nejw=NaN:", estar(i), v0
-    !                    read(*,*)
-    !                end if
-    !            ! print*, abs(sp%en),v0**2
-    !            ! read(*,*)
-    !                !jmax=mbh/(2*sp%en)**0.5d0
-    !                nejw(nsam)%j=jstar(i)!/jmax
-    !                nejw(nsam)%w=wstar(i)
-    !                nejw(nsam)%idx=i
-    !            end if
-    !        end do
+     
 end subroutine    
 subroutine conv_dms_nejw_obj(dm,en,jm,m,rp,ra,pd,jc,rad,w_real,nobj, obj_type)
     use com_main_gw
@@ -718,8 +597,7 @@ subroutine conv_dms_nejw_obj(dm,en,jm,m,rp,ra,pd,jc,rad,w_real,nobj, obj_type)
     call get_ejw_from_particle(en(1:nobj),jm(1:nobj),wobj(1:nobj),rp(1:nobj),&
         ra(1:nobj),pd(1:nobj), jc(1:nobj), m(1:nobj), rad(1:nobj), &
         nobj, minval(ctl%bin_mass_m1(1:ctl%m_bins)), maxval(ctl%bin_mass_m2(1:ctl%m_bins)), dm%mtot, dm%v0, dm%x_boundary, &
-        dm%all%dsp(dsp_idx)%p%nejw,dm%all%dsp(dsp_idx)%p%n,dm%all%dsp(dsp_idx)%p%n_real)
-        !print*, "dsp_idx,n=",dsp_idx,dm%all%dsp(dsp_idx)%p%n
+        dm%all%dsp(dsp_idx)%p%nejw,dm%all%dsp(dsp_idx)%p%n,dm%all%dsp(dsp_idx)%p%n_real) 
     do i=1, dm%n
         associate(mb=>dm%mb(i))
             m1=mb%m1; m2=mb%m2           
@@ -728,8 +606,7 @@ subroutine conv_dms_nejw_obj(dm,en,jm,m,rp,ra,pd,jc,rad,w_real,nobj, obj_type)
             jm(1:nobj),wobj(1:nobj),rp(1:nobj),&
             ra(1:nobj),pd(1:nobj), jc(1:nobj), m(1:nobj), rad(1:nobj), &
             nobj, m1, m2, dm%mtot, dm%v0, dm%x_boundary, mb%dsp(dsp_idx)%p%nejw,mb%dsp(dsp_idx)%p%n, &
-            mb%dsp(dsp_idx)%p%n_real)
-            !print*, "mi,n=",i, mb%dsp(dsp_idx)%p%n
+            mb%dsp(dsp_idx)%p%n_real) 
         end associate      
     end do
     
@@ -753,13 +630,7 @@ subroutine conv_dms_newj_obj_one(dm, bk, i_obj)
     pd=bk%sp(1:bk%n)%period
     jc=bk%sp(1:bk%n)%jc
     rad=bk%sp(1:bk%n)%byot%ms%radius
-    weight_real=bk%sp(1:bk%n)%weight_real
-    ! do i=1, bk%n
-    !     if(mass(i)>20)then
-    !         print*, "weight_real=",weight_real(i),mass(i), bk%sp(i)%weight_clone, bk%sp(i)%weight_N
-    !         read(*,*)
-    !     end if
-    ! end do
+    weight_real=bk%sp(1:bk%n)%weight_real 
     call conv_dms_nejw_obj(dm,en, jm , mass, rp,ra,pd,jc, rad, weight_real, bk%n, i_obj)
 end subroutine
 
@@ -769,13 +640,10 @@ subroutine conv_dms_nejw(dm, bkstellar_sg)
     type(diffuse_mspec)::dm
     type(particle_samples_arr_type)::bkstellar_sg(n_tot_comp_sg)
     integer i,j,obj_type
-
-    !print*, "n_tot_comp_sg=",n_tot_comp_sg
+ 
     do i=1, n_tot_comp_sg
-        call get_type_from_ctl_obidx_sg(i,obj_type)
-        !print*, "obj_type=",i, obj_type
-        call conv_dms_newj_obj_one(dm, bkstellar_sg(i),obj_type)
-        ! end if
+        call get_type_from_ctl_obidx_sg(i,obj_type) 
+        call conv_dms_newj_obj_one(dm, bkstellar_sg(i),obj_type) 
     end do
     call update_dms_numbers(dm)
 end subroutine
@@ -812,25 +680,11 @@ subroutine update_dms_numbers(dm)
                     end if
                   
                 end if
-            end do
-            !print*, "mb%all%n=",mb%all%n
-            !mb%all%n=0
-            !mb%all%n=mb%star%n+mb%bstar%n+mb%bbh%n+mb%sbh%n+mb%wd%n+mb%ns%n+&
-			!	mb%bd%n+mb%rg%n+mb%dark_matter%n
-            !print*, "mb%all%n=",mb%all%n
-            !read(*,*)
+            end do 
         end associate            
     end do
     associate(all=>dm%all)
-        
-        ! do i=1, n_tot_comp
-        !     all%dsp(i)%p%n=0
-        !     all%dsp(i)%p%n_real=0
-        !     do j=1,dm%n
-        !         all%dsp(i)%p%n=all%dsp(i)%p%n+dm%mb(j)%dsp(i)%p%n
-        !         all%dsp(i)%p%n_real=all%dsp(i)%p%n_real+dm%mb(j)%dsp(i)%p%n_real
-        !     end do
-        ! end do
+         
 
         do i=1, n_tot_comp
             all%all%n=0
@@ -847,36 +701,13 @@ subroutine separate_to_species(bks, bkstellar_obj)
     implicit none
     type(particle_samples_arr_type)::bks, bkstellar_obj(n_tot_comp_sg)
     integer stellar_type,i
-  
-   !call separate_to_species_single(bks, bkstar, bksbh, bkwd, bkns,bkbd)
+   
    do i=1, n_tot_comp_sg
         call get_type_from_ctl_obidx_sg(i,stellar_type)
-        call sams_arr_select_type_single(bks, bkstellar_obj(i), stellar_type)
-        ! if(rid.eq.0)then
-        !     print*, "type,n=",stellar_type,bkstellar_obj(i)%n
-        ! end if
+        call sams_arr_select_type_single(bks, bkstellar_obj(i), stellar_type) 
    end do
 end subroutine
-
-subroutine gen_nxj_fxj_gx_regular(dm)
-    use com_main_gw
-    implicit none
-    type(diffuse_mspec)::dm
-    type(particle_samples_arr_type)::bkstar, bksbh, bkwd, bkns
-	type(particle_samples_arr_type)::bkbd
-    logical::norm_in
-    if(ctl%barge_evl_method.eq.barge_evl_method_grid_2d)then
-        call get_nxj(dm)
-    end if
-    !call set_barge_p()
-    call get_nx_simu(dm)
-    if(ctl%barge_evl_method.eq.barge_evl_method_grid_2d)then
-	    call get_fxj0(dm)
-    end if
-	call get_fj0(dm)
-
-    call get_barge0(dm)
-end subroutine
+ 
 
 subroutine gen_nxj_fxj_gx_iregular(dm,spp)
     use com_main_gw
@@ -922,8 +753,7 @@ subroutine gen_nxj_fxj_gx_iregular(dm,spp)
         call get_barge0(dm)
     else
         call set_gx_nx_ranges_ir(dm)
-        call get_nx_ir_simu(dm)
-        call get_fj0(dm)
+        call get_nx_ir_simu(dm) 
         call get_barge0(dm)
     end if
     !if(rid.eq.0.and.ctl%chattery.ge.2)then
@@ -1001,31 +831,7 @@ subroutine print_norm_dms(dm,out_unit)
     end do
     write(out_unit, fmt="(A8,12I10)") "N:", ctl%bin_mass_simulation_particle_number_tot(1:dm%n)
 end subroutine
-subroutine check_boundary(str)
-    use com_main_gw
-    implicit none
-    type(chain_pointer_type),pointer::pt
-    integer n
-    character*(*) str
-    
-    n=0
-    pt=>bksams%head
-    print*, "begin of check boundary"//trim(adjustl(str)),rid
-    do while(associated(pt))
-        if(pt%ob%exit_flag.eq.exit_normal)then
-            if(pt%ob%en>ctl%energy_boundary)then
-                print*, "error, ps%ob%exit_flag.ne.exit_boundary_min.and.ps%ob%en>ctl%energy_boundary"
-                print*, "ps%ob%exit_flag,ps%ob%en,ctl%energy_boundary=",pt%ob%exit_flag,pt%ob%en,&
-                    ctl%energy_boundary
-                print*, "x,xmin=",pt%ob%x,pt%ob%en/ctl%energy0,ctl%x_boundary
-                call pt%ob%print(trim(adjustl(str)))
-                stop
-            end if
-        end if
-        pt=>pt%next
-    end do
-   print*, "end of check boundary"//trim(adjustl(str)),rid
-end subroutine
+ 
 subroutine print_num_boundary(dm)
     use com_main_gw
     implicit none
@@ -1038,8 +844,7 @@ subroutine print_num_boundary(dm)
     write(*,fmt="(A3, 10A13)") "i","mc", "star", "sbh", "ns", "wd","bd", "rg"
     do i=1, dm%n
         call get_num_boundary(nb(i,1), nbj1(i,1), nbj2(i,1), nbw(i,1),dm%mb(i)%star)
-        call get_num_boundary(nb(i,2), nbj1(i,2), nbj2(i,2), nbw(i,2),  dm%mb(i)%sbh)
-        ! call get_num_boundary(nb(i,3), nbj1(i,3), nbj2(i,3), nbw(i,3), dm%mb(i)%bbh)
+        call get_num_boundary(nb(i,2), nbj1(i,2), nbj2(i,2), nbw(i,2),  dm%mb(i)%sbh) 
 		call get_num_boundary(nb(i,3), nbj1(i,3), nbj2(i,3), nbw(i,3), dm%mb(i)%ns)
 		call get_num_boundary(nb(i,4), nbj1(i,4), nbj2(i,4), nbw(i,4), dm%mb(i)%wd)
 		call get_num_boundary(nb(i,5), nbj1(i,5), nbj2(i,5), nbw(i,5), dm%mb(i)%bd)
@@ -1052,11 +857,7 @@ subroutine print_num_boundary(dm)
 	write(*,fmt="(A3, 8A13)") "i","mc", "starw", "sbhw",  "nsw", "wdw","bdw", "rgw", "nHew"
 	do i=1, dm%n
         write(*,fmt="(I3,7F13.2)") i, dm%mb(i)%mc, nbw(i,1:8)
-    end do
-	!write(*,fmt="(A3, 8A13)") "i","mc","j>0.5","","","j<0.5"
-    !do i=1, dm%n
-    !    write(*,fmt="(I3,7F13.2)") i, dm%mb(i)%mc, nbj1(i,1:3), nbj2(i,1:3)
-    !end do
+    end do 
     write(*,fmt=*) "end of print_num_boundary==================="
 end subroutine
 subroutine get_num_all(nb,nbw, so)
@@ -1097,87 +898,8 @@ subroutine get_num_boundary(nb,nbj1,nbj2,nbw, so)
         end if
     end do
 end subroutine
-
-subroutine get_fj0(dm)
-	use com_main_gw
-	implicit none
-	type(diffuse_mspec)::dm
-	integer i
-	do i=1, dm%n
-		call get_fj(dm%mb(i))
-	end do
-   ! print*, "get_fxj0:"
-   ! print*, dm%mb(1)%star%nxj%nxyw(:,3)
-   ! print*, dm%mb(1)%star%gxj%fxy(:,3)
-
-	!call get_fj(dm%all)
-   ! print*, dm%all%star%nxj%nxyw(:,3)
-   ! print*, dm%all%star%gxj%fxy(:,3)
-end subroutine
-subroutine get_fj(mb)
-	use com_main_gw
-	implicit none
-	type(mass_bins)::mb
-	if(mb%star%n>1)then
-	!print*, "mb%star%n=", mb%star%n
-	!print*,"size(mb%star%nejw)=",size(mb%star%nejw) 
-		call dms_so_get_fj(mb%star)
-	end if
-	if(mb%sbh%n>1)then
-		call dms_so_get_fj(mb%sbh)
-	end if
-end subroutine
-
-
-
-subroutine get_fden_sample_particle_old(sp,fden)
-	use com_main_gw
-	implicit none
-	type(particle_samples_arr_type)::sp
-	type(sts_fc_type)::fden
-	integer i,n
-	real(8) r(sp%n), a(sp%n), e(sp%n), rnd, mean
-	n=sp%n
-	
-	a(1:sp%n)=sp%sp(1:n)%byot%a_bin
-	e(1:sp%n)=sp%sp(1:n)%byot%e_bin
-	do i=1, n
-		mean=rnd(0d0,2*pi)
-		call get_r_given_mean(a(i),e(i),mean, r(i))
-	end do
-	!call get_fc_weight(log10(r(1:sp%n)), sp%sp(1:n)%weight_real, &
-	!	n, fden)
-    call get_sts_data_weight(log10(r(1:sp%n)), sp%sp(1:n)%weight_real, &
-		n, log10(0.5d0*r0_cl/1d5), log10(0.5*r0_cl/0.1d0), dms%df_coe_bins, &
-            fc_spacing_linear, fden)
-	do i=1, fden%nbin
-		fden%fx(i)=fden%nbw(i)/(4*pi*&
-		(10**(fden%xb(i)*2))*10**fden%xb(i)*fden%xstep*log(10d0))
-	end do
-	!print*, "fden%xstep=", fden%xstep, fden%xmin, fden%xmax
-end subroutine
-
-subroutine get_distr_of_j(e,j,w,n, barj)
-    use model_basic
-    use com_sts_type
-    implicit none
-    integer i, n, nsel
-    real(8) e(n),j(n),w(n), bd
-    real(8)::jb(n),wb(n)
-    type(sts_fc_type)::barj
-    nsel=0
-    do i=1, n
-        !if(10**e(i)<ctl%x_boundary)then
-            nsel=nsel+1
-            jb(nsel)=j(i)**2
-            wb(nsel)=w(i)
-        !end if
-    end do
-    call get_fc_weight(jb,wb, nsel, barj)
-    !barj%fx=barj%fx
-    !call barj%print("barj")
-    !stop
-end subroutine
+ 
+  
  
 
 subroutine update_weights()
