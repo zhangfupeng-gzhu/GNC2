@@ -131,9 +131,7 @@ subroutine init_model_ctl()
  
     ctl%num_boundary_created=0
 	ctl%num_boundary_elim=0
-    ctl%num_clone_created=0 
-    if(allocated(lambda_aux))deallocate(lambda_aux)
-    allocate(lambda_aux(ctl%m_bins))
+    ctl%num_clone_created=0  
 	ctl%nblock_size=int(ctl%diff_coeff_bins/ctl%ntasks)
     ctl%nblock_mpi_bg=rid+1
     ctl%nblock_mpi_ed=ctl%diff_coeff_bins

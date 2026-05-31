@@ -3,26 +3,14 @@ subroutine dm_get_dc_mpi(dm)
     use com_main_gw
     implicit none
     type(diffuse_mspec):: dm
-    interface
-        subroutine mb_get_dc_mpi(mb)
-            use com_main_gw
-            implicit none
-            type(mass_bins),target::mb
-        end subroutine
+    interface 
 		subroutine mb_get_dc_mpi_starpt_gx_iregular(mb,spp)
 			use com_main_gw
 			implicit none
 			type(mass_bins),target::mb
 		!	type(s1d_type)::phi_star
 			type(star_pot_para)::spp
-		end subroutine
-		subroutine mb_get_dc_mpi_starpt_gx_regular(mb,spp)
-			use com_main_gw
-			implicit none
-			type(mass_bins),target::mb
-			!type(s1d_type)::phi_star
-			type(star_pot_para)::spp
-		end subroutine
+		end subroutine 
     end interface
     integer i
 
@@ -47,33 +35,9 @@ subroutine dm_get_dc_mpi(dm)
 			case(fden_ana_est_method_2d)
 				call mb_get_dc_mpi_starpt_gx_iregular_2d(dm%mb(i),spp_new)
 			end select
-			
-		else
-			if(rid.eq.0)then
-				print*, "dc grid type=dc_grid_regular"
-			endif
-			!select case(ctl%barge_grid_type)
-			!case(barge_grid_type_regular)
-			!	if(rid.eq.0)then
-			!		print*, "barge grid type=regular"
-			!	end if
-			!	call mb_get_dc_mpi_starpt_gx_regular(dm%mb(i),spp_new)
-			!case(barge_grid_type_iregular_barp,barge_grid_type_iregular_phi,barge_grid_type_regular)
-				if(rid.eq.0)then
-					print*, "barge grid type=iregular"
-				end if
-				call mb_get_dc_mpi_starpt_gx_iregular(dm%mb(i),spp_new)
-			!end select
-		endif 
+		endif
 	end do
-	! else
-	! 	print*, "dm_get_dc_mpi, no star potential"
-	! 	stop
-	! 	do i=1, dm%n
-	! 		call mb_get_dc_mpi(dm%mb(i))
-	! 	end do
-	! end if
-    !call get_dc0_bk(dm)
+	 
     call get_dc0(dm)
      
 end subroutine
@@ -99,95 +63,7 @@ subroutine set_dc_bins_ir(dm)
 	dm%dc0%s2_djj%xcenter=dms%dlxb_ir%xb
 	dm%dc0%s2_dej%xcenter=dms%dlxb_ir%xb
 
-end subroutine
-
-subroutine get_coeff_ej_spt_y_gx_regular( xb, yb,n, spp,barge,asymp, &
-	e_110,e_0,ee,j_111,j_rest,jj,ej)
-use com_main_gw
-implicit none
-!type(s1d_type)::phi_star
-type(star_pot_para)::spp
-integer n,i,j
-type(s1d_type),target::barge
-real(8) asymp,energyx,jum
-integer ierr
-integer nbg, ned, nblock, ntasks
-external::fgx_mb
-real(8) xb(n),yb(n)
-real(8) e_110(n,n),e_0(n,n),ee(n,n) 
-real(8) j_111(n,n),j_rest(n,n),jj(n,n),ej(n,n)
-real(8) f0
-real(8) t1, t2,t3,t4
-!print*, "1"
-fc_share=>barge
-!print*, "2"
-fgx_g0=asymp
-if(all(fc_share%fx.eq.0d0))then
-	e_110=0
-	e_0=0
-	ee=0
-	jj=0
-	j_111=0
-	j_rest=0
-	ej=0
-	return
-end if
-!emin_dstr_factor=10**fc_share%xb(1)
-!emax_dstr_factor=10**fc_share%xb(fc_share%nbin)
-nbg=ctl%nblock_mpi_bg
-ned=ctl%nblock_mpi_ed
-nblock=ctl%nblock_size
-ntasks=ctl%ntasks
-
-call cpu_time(t1)
-
-do i=nbg, ned, ntasks
-	!i=46
-	energyx=xb(i)			
-	!call cpu_time(t3)		
-	!print*, "i,rid=", i,rid
-	call get_sigma0(energyx, fgx_mb, f0)
-	do j=1, n
-		jum=yb(j)	
-		!print*, "j,rid=", j,rid
-		call get_coeff_ffuncs_cfs_grid(energyx,jum, fgx_mb,spp, &
-			 dms%rp%fxy(i,j),dms%ra%fxy(i,j),dms%pd%fxy(i,j),dms%jc%fx(i),&
-			f0, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j)) 
-			!print*, rid, i,j, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j)
-			!stop
-			!read(*,*)
-	end do
-	!call cpu_time(t4)
-	!print*, "i, rid,dt=",i, rid, t4-t3
-end do
-!	read(*,*)
-call cpu_time(t2)
-if(rid.eq.0)then
-	print*, "timetakes,ibg, ied=",  t2-t1, nbg, ned
-end if
-call mpi_BARRIER(mpi_comm_world, ierr)
-call collect_data_mpi_y(e_110, n,nbg, ned, nblock, ntasks)
-!if(rid.eq.1)then
-!	do i=1, n
-!		write(*,fmt="(20F10.3)") e_110(i,:)
-!	end do
-!end if
-!stop
-call mpi_BARRIER(mpi_comm_world, ierr)
-call collect_data_mpi_y(e_0, n,nbg, ned, nblock, ntasks)
-call mpi_BARRIER(mpi_comm_world, ierr)
-call collect_data_mpi_y(ee, n,nbg, ned, nblock, ntasks)
-call mpi_BARRIER(mpi_comm_world, ierr)
-call collect_data_mpi_y(ej, n,nbg, ned, nblock, ntasks)
-call mpi_BARRIER(mpi_comm_world, ierr)
-call collect_data_mpi_y(jj, n,nbg, ned, nblock, ntasks)
-call mpi_BARRIER(mpi_comm_world, ierr)
-call collect_data_mpi_y(j_rest, n,nbg, ned, nblock, ntasks)
-call mpi_BARRIER(mpi_comm_world, ierr)
-call collect_data_mpi_y(j_111, n,nbg, ned, nblock, ntasks)
-end subroutine
-
-
+end subroutine 
 subroutine get_coeff_ej_spt_y_gx_iregular( xb, yb,n, spp,barge,asymp, &
 	e_110,e_0,ee,j_111,j_rest,jj,ej)
 	use com_main_gw
@@ -215,20 +91,8 @@ subroutine get_coeff_ej_spt_y_gx_iregular( xb, yb,n, spp,barge,asymp, &
 	nbg=ctl%nblock_mpi_bg
 	ned=ctl%nblock_mpi_ed
 	nblock=ctl%nblock_size
-	ntasks=ctl%ntasks
-	!ctl%nblock_size=int(n/ctl%ntasks)
-	!ctl%nblock_mpi_bg=ctl%nblock_size*rid+1
-	!ctl%nblock_mpi_ed=ctl%nblock_size*(rid+1)
-	!allocate(f0(n,n))
-	!print*, "get_coeff_ej_spt"
-	call cpu_time(t1)
-	!block
-	!	character*(4) str_rid
-	!	write(unit=str_rid,fmt="(I4)") rid
-	!	call barge%print("barge"//trim(adjustl(str_rid)))
-	!end block
-
-	!call check_rp_ra("get_coeff_ej_spt_y")
+	ntasks=ctl%ntasks 
+	call cpu_time(t1) 
 
 	do i=nbg, ned, ntasks
 		!i=46
@@ -240,44 +104,20 @@ subroutine get_coeff_ej_spt_y_gx_iregular( xb, yb,n, spp,barge,asymp, &
 
 		call get_sigma0(energyx, fgx_mb_ir, f0)
 		do j=1, n
-			jum=yb(j)
-
-			!jum=yb(n)
-
-			!print*, "i,j,rid=", i,j,rid
+			jum=yb(j) 
 			
 			call get_coeff_ffuncs_cfs_grid(energyx,jum, fgx_mb_ir,spp, &
 			dms%rp%fxy(i,j),dms%ra%fxy(i,j),dms%pd%fxy(i,j),dms%jc%fx(i),&
-			f0, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j)) 
-		
-			!print*, "ex,jum=",energyx,jum, e_110(i,j), e_0(i,j),ee(i,j)
-			!if(jum>0.96)then
-				!print*, e_110(i,j), e_0(i,j),ee(i,j)
-				!call get_coeff_ffuncs_cfs_grid_circular(energyx, fgx_mb_ir,spp, &
-				!dms%rp%fxy(i,j),f0, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j)) 
-				!print*, "2=",e_110(i,j), e_0(i,j),ee(i,j)
-				!read(*,*)
-			!end if
-				!print*, rid, i,j, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j)
-				!stop
-				!read(*,*)
-		end do
-		!call cpu_time(t4)
-		!print*, "i, rid,dt=",i, rid, t4-t3
-	end do
-	!	read(*,*)
+			f0, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j))  
+		end do 
+	end do 
 	call cpu_time(t2)
 	if(rid.eq.0)then
 		print*, "timetakes,ibg, ied=",  t2-t1, nbg, ned
 	end if
 	call mpi_BARRIER(mpi_comm_world, ierr)
 	call collect_data_mpi_y(e_110, n,nbg, ned, nblock, ntasks)
-	!if(rid.eq.1)then
-	!	do i=1, n
-	!		write(*,fmt="(20F10.3)") e_110(i,:)
-	!	end do
-	!end if
-	!stop
+	 
 	call mpi_BARRIER(mpi_comm_world, ierr)
 	call collect_data_mpi_y(e_0, n,nbg, ned, nblock, ntasks)
 	call mpi_BARRIER(mpi_comm_world, ierr)
@@ -291,104 +131,7 @@ subroutine get_coeff_ej_spt_y_gx_iregular( xb, yb,n, spp,barge,asymp, &
 	call mpi_BARRIER(mpi_comm_world, ierr)
 	call collect_data_mpi_y(j_111, n,nbg, ned, nblock, ntasks)
 end subroutine
-
-subroutine get_coeff_ej_spt_y_ir( xb, yb,n,spp,barge,asymp, &
-	e_110,e_0,ee,j_111,j_rest,jj,ej)
-	use com_main_gw
-	implicit none
-	!type(s1d_type)::phi_star
-	type(star_pot_para)::spp
-	integer n,i,j
-	type(s1d_ird_type),target::barge
-	real(8) asymp,energyx,jum
-	integer ierr
-	integer nbg, ned, nblock, ntasks
-	external::fgx_mb
-	real(8) xb(n),yb(n)
-	real(8) e_110(n,n),e_0(n,n),ee(n,n) 
-	real(8) j_111(n,n),j_rest(n,n),jj(n,n),ej(n,n)
-	real(8) f0
-	real(8) t1, t2,t3,t4
-
-	fc_ir_share=>barge
-
-	fgx_g0=asymp
-	if(all(fc_ir_share%fx.eq.0d0))then
-		e_110=0
-		e_0=0
-		ee=0
-		jj=0
-		j_111=0
-		j_rest=0
-		ej=0
-		return
-	end if
-	!emin_dstr_factor=10**fc_share%xb(1)
-	!emax_dstr_factor=10**fc_share%xb(fc_share%nbin)
-	nbg=ctl%nblock_mpi_bg
-	ned=ctl%nblock_mpi_ed
-	nblock=ctl%nblock_size
-	ntasks=ctl%ntasks
-	!ctl%nblock_size=int(n/ctl%ntasks)
-	!ctl%nblock_mpi_bg=ctl%nblock_size*rid+1
-	!ctl%nblock_mpi_ed=ctl%nblock_size*(rid+1)
-	!allocate(f0(n,n))
-	!print*, "get_coeff_ej_spt"
-	call cpu_time(t1)
-	!block
-	!	character*(4) str_rid
-	!	write(unit=str_rid,fmt="(I4)") rid
-	!	call barge%print("barge"//trim(adjustl(str_rid)))
-	!end block
-
-	!call check_rp_ra("get_coeff_ej_spt_y")
-
-	do i=nbg, ned, ntasks
-		!i=46
-		energyx=xb(i)			
-		!call cpu_time(t3)		
-		
-		call get_sigma0(energyx, fgx_mb, f0)
-		do j=1, n
-			jum=yb(j)	
-			!print*, "i,j,rid=", i,j,rid
-			call get_coeff_ffuncs_cfs_grid(energyx,jum, fgx_mb,spp, &
-				dms%rp%fxy(i,j),dms%ra%fxy(i,j),dms%pd%fxy(i,j),dms%jc%fx(i),&
-				f0, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j)) 
-				!print*, rid, i,j, e_110(i,j), e_0(i,j),ee(i,j), ej(i,j), jj(i,j), j_rest(i,j), j_111(i,j)
-				!stop
-				!read(*,*)
-		end do
-		!call cpu_time(t4)
-		!print*, "i, rid,dt=",i, rid, t4-t3
-	end do
-	!	read(*,*)
-	call cpu_time(t2)
-	if(rid.eq.0)then
-		print*, "timetakes,ibg, ied=",  t2-t1, nbg, ned
-	end if
-	call mpi_BARRIER(mpi_comm_world, ierr)
-	call collect_data_mpi_y(e_110, n,nbg, ned, nblock, ntasks)
-	!if(rid.eq.1)then
-	!	do i=1, n
-	!		write(*,fmt="(20F10.3)") e_110(i,:)
-	!	end do
-	!end if
-	!stop
-	call mpi_BARRIER(mpi_comm_world, ierr)
-	call collect_data_mpi_y(e_0, n,nbg, ned, nblock, ntasks)
-	call mpi_BARRIER(mpi_comm_world, ierr)
-	call collect_data_mpi_y(ee, n,nbg, ned, nblock, ntasks)
-	call mpi_BARRIER(mpi_comm_world, ierr)
-	call collect_data_mpi_y(ej, n,nbg, ned, nblock, ntasks)
-	call mpi_BARRIER(mpi_comm_world, ierr)
-	call collect_data_mpi_y(jj, n,nbg, ned, nblock, ntasks)
-	call mpi_BARRIER(mpi_comm_world, ierr)
-	call collect_data_mpi_y(j_rest, n,nbg, ned, nblock, ntasks)
-	call mpi_BARRIER(mpi_comm_world, ierr)
-	call collect_data_mpi_y(j_111, n,nbg, ned, nblock, ntasks)
-end subroutine
-
+ 
 
 subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 	f0,e110,e0,ee,ej,jj, jrest,j111)
@@ -416,19 +159,7 @@ subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 		f0,e110,e0,ee,ej,jj, jrest,j111)
 		return
 	end if
-	!block
-	!	real(8) vr_tmp, phi_star_tmp
-	!	call get_phi_star_full_range(fphi,log10(ra),phi_star_tmp)
-	!		vr_tmp=(2*(10**phi_star_tmp+mbh_dmless/ra-ex)*ra**2-(jum*jc)**2)/ra**2
-	!		if(abs(vr_tmp)>0.01)then
-	!			print*, "check out!"
-	!			print*, "vr(ra), ra, ex, jum, rc=",vr_tmp, ra, ex,jum
-	!			print*, "mbhmass=",mbh,mbh_dmless
-	!			print*, "rid=",rid
-	!			stop
-	!		end if
-	!end block
-
+	  
 	call get_aux_function_for_period_pi2(common_aux, spp,ex,jum,jc,rp,ra)
 	!call common_aux%prepare_spline()
 
@@ -436,8 +167,7 @@ subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 	nintn=f12_function_bin_size_1
 	else
 	nintn=f12_function_bin_size_2
-	end if
-	!!nintn=int(3*10**(-log10(jum)*2d0/3d0+1d0))
+	end if 
 	lrp=log10(rp)
 	lra=log10(ra)
 	!
@@ -445,28 +175,12 @@ subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 	call f1%set_range()
 	call f2%init( lrp, lra,nintn, sts_type_grid)
 	call f2%set_range()
-	!print*, "start fseries"
-
-	!call f1%init(nintn, 0d0, pi/2d0, sts_type_grid)
-	!call set_range_s1d(f1)
-	!call f2%init(nintn, 0d0, pi/2d0, sts_type_grid)
-	!call set_range_s1d(f2)
-	!print*, "start fseries"	
-	!if(rid.eq.0)then
-	!	do i=1, dms%n
-	!		print*, "i=",i,rid
-	!		call dms%mb(i)%all%barge%print("barge")
-	!	end do
-	!end if
-	emax=10**fc_ir_share%xmax !min(emax_factor,dms%emax)
-	!print*, "ex,jm=",ex,jum
-	!call cpu_time(t2)
-	!print*, "1:t=",t2-t1
+	 
+	emax=10**fc_ir_share%xmax !min(emax_factor,dms%emax) 
 	select case(ctl%get_dc_method)			
 	case(get_dc_method_fast)
 		do i=2, nintn-1
-		!call get_ffuncs_series(ex, emax, emin_factor, mbh_dmless, f1%xb(i), ra,rp, spp, fgx, f1%fx(i), 0.5d0)
-		!print*, "f1%fx(i)=",f1%fx(i)
+ 
 			call get_ffuncs_series_fast(ex,  spp_new%mbh_dmless, f1%xb(i), jum, jc, ra,rp, spp, fgx, f1%fx(i), 0.5d0,.false.)
 			call get_ffuncs_series_fast(ex,  spp_new%mbh_dmless, f2%xb(i), jum, jc, ra,rp, spp, fgx, f2%fx(i), 1.5d0,.false.)
 		end do
@@ -487,33 +201,9 @@ subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 		 !
 		 call get_ffuncs_series_rarp(ex, emax, emin_factor, lrp,  jum, jc, fgx, f2%fx(1), 1.5d0)
 		 call get_ffuncs_series_rarp(ex, emax, emin_factor, lra,  jum, jc, fgx, f2%fx(nintn), 1.5d0)	
-	case(get_dc_method_sqr)
-		!do i=2, nintn-1
-		!	!call get_ffuncs_series(ex, emax, emin_factor, mbh_dmless, f1%xb(i), ra,rp, spp, fgx, f1%fx(i), 0.5d0)
-		!	!print*, "f1%fx(i)=",f1%fx(i)
-		!		call get_ffuncs_series_fast_sqrt(ex,  mbh_dmless, f1%xb(i), jum, jc, ra,rp, spp, fgx, f1%fx(i), 0.5d0,.false.)
-		!		call get_ffuncs_series_fast_sqrt(ex,  mbh_dmless, f2%xb(i), jum, jc, ra,rp, spp, fgx, f2%fx(i), 1.5d0,.false.)
-		!	end do
-		!	call get_ffuncs_series_fast_sqrt(ex, mbh_dmless, lrp,  jum, jc, ra,rp, spp, fgx, f1%fx(1), 0.5d0,.true.)
-		!	call get_ffuncs_series_fast_sqrt(ex, mbh_dmless, lra,  jum, jc, ra,rp, spp, fgx, f1%fx(nintn), 0.5d0,.true.)
-		!	call get_ffuncs_series_fast_sqrt(ex, mbh_dmless, lrp,  jum, jc, ra,rp, spp, fgx, f2%fx(1), 1.5d0,.true.)
-		!	call get_ffuncs_series_fast_sqrt(ex, mbh_dmless, lra,  jum, jc, ra,rp, spp, fgx, f2%fx(nintn), 1.5d0,.true.)
-		print*, "finish the code here"
-		stop
+ 
 	end select
-	!print*, "f11,f1n, f21,f2n=",f1%fx(1),f2%fx(nintn),f2%fx(1),f2%fx(nintn)
-
-	!call get_ffuncs_series_rarp(ex, emax, emin_factor, lrp,  jum, jc, fgx, f1%fx(1), 0.5d0)
-	!call get_ffuncs_series_rarp(ex, emax, emin_factor, lra,  jum, jc, fgx, f1%fx(nintn), 0.5d0)
-	!call get_ffuncs_series_rarp(ex, emax, emin_factor, lrp,  jum, jc, fgx, f2%fx(1), 1.5d0)
-	!call get_ffuncs_series_rarp(ex, emax, emin_factor, lra,  jum, jc, fgx, f2%fx(nintn), 1.5d0)
-	!print*, "f11,f1n, f21,f2n=",f1%fx(1),f2%fx(nintn),f2%fx(1),f2%fx(nintn)
-	!read(*,*)
-
-	!call cpu_time(t3)
-	!print*, "2:t=",t3-t2
-	!t2=t3
-	!call f2%print("f2")
+	 
 
 	if(ctl%chattery.ge.3)then
 	print*, "ex,jum,log10(ex),log10(jum), jc, rp, ra=",ex,jum,log10(ex),log10(jum), jc, rp, ra
@@ -521,13 +211,8 @@ subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 	call f1%print("f1")
 	call f2%print("f2")
 	!read(*,*)
-	end if
-	!call f1%prepare_spline()
-	!call f2%prepare_spline()
-	e110=0
-	!ctl%debug=0
-	!print*, "rp,ra=",rp,ra
-	!call dms%mb(1)%all%barge%print("barge")
+	end if 
+	e110=0 
 
 	call my_integral_acc(0d0,pi/2d0, e110, star_dc_int_acc_a,star_dc_int_acc_r, fcn_e110,idid)	
 	if(idid<0)then
@@ -541,10 +226,7 @@ subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 	e110=e110/pd*2
 	e0=-f0
 	ee=0
-	!if(ctl%debug.ge.1)then
-	!	print*, "e110=", e110, pd
-	!	read(*,*)
-	!end if
+	 
 	call my_integral_acc(1d-6,pi/2d0, ee,star_dc_int_acc_a,star_dc_int_acc_r, fcn_ee,idid)	
 	if(idid<0)then
 	print*, "stop, ee problem, rid=", rid
@@ -611,58 +293,22 @@ subroutine get_coeff_ffuncs_cfs_grid(ex,jum, fgx,spp, rp,ra,pd,jc,&
 	call f1%print("f1")
 	call f2%print("f2")
 	stop
-	end if
-
-	!if(abs(ej/sqrt(jj*ee))>1)then
-	!	print*, "??, ej/sqrt(jj*ee)>1,ej,jj,ee,ej/(jj*ee)**0.5", ej, jj, ee, ej/sqrt(jj*ee)
-	!	print*, "ex,jum,log10(ex),log10(jum), jc, rp, ra=",ex,jum,log10(ex),log10(jum), jc, rp, ra
-	!	block 
-	!		use com_main_gw
-	!		call dms%mb(1)%all%barge%print("gx")
-	!	end block
-	!	call aux%print("aux")
-	!	call f1%print("f1")
-	!	call f2%print("f2")
-	!	call beta%print("beta")
-	!	stop
-	!end if
-	!call cpu_time(t3)
-	!print*, "3:t=",t3-t2
-	!read(*,*)
+	end if 
 contains
 	subroutine fcn_e110(n, x, y, f, par, ipar)
 	implicit none
 	integer n, ipar(100)
 	real(8) x, y(n), f(n), par(100),vr,vr2
 	real(8) f1inp,r, aux_tmp
-
-	!call linear_int(f1%xb,f1%fx,f1%nbin, log10(x),f1inp)
-	!if(f1inp<0) f1inp=0
+ 
 	r=rp+(ra-rp)*sin(x)**2
 	
 	call common_aux%get_value_l(x, aux_tmp)
-	call f1%get_value_l(log10(r), f1inp)
-	!call splint_mylib(f1%xb,f1%fx,f1%y2a,f1%nbin, x, f1inp)
+	call f1%get_value_l(log10(r), f1inp) 
 	f1inp=10**f1inp
 
-	!call get_phi_star_full_range(fphi,log10(r),fphiinp)
-	!fphiinp=10**fphiinp
-	!call fphi%get_value_l(log10(x),fphiinp)
-
-	!vr2=2*(fphiinp+1d0/x-ex)-(jum*jc)**2/x**2
-	!print*, "x, fphiinp, 1/x, ex, (jum*jc)**2/x**2, vr2=", x, fphiinp, 1/x, ex, (jum*jc)**2/x**2, vr2
-	!read(*,*)
-	!if(x<rp*(ra/rp))then
-	!	call beta%get_value_s(log10(x), beta_tmp)
-	!	print*, 1d0/vr2**0.5d0, 2**0.5/(x-rp)**0.5*(-(1+beta_tmp)/rp**2+(jum*jc)**2/rp**3)**(-0.5)
-	!	read(*,*)
-	!end if
-
-	!elseif(vr2>1d-4)then
-	!	vr=vr2**0.5d0
-		f(1)=f1inp*aux_tmp
-	!	print*, "x, f(1), f1inp, aux_tmp=", x, f(1), f1inp, aux_tmp
-	!end if
+	f(1)=f1inp*aux_tmp
+ 
 	if(ieee_is_nan(f1inp).or.ieee_is_nan(f(1)).or.(.not.ieee_is_finite(f(1))))then
 		print*, "nan detected,  f1inp=", f1inp 
 		call f1%print("f1")
@@ -692,43 +338,25 @@ contains
 	if(ieee_is_nan(fphiinp).or.ieee_is_nan(f2inp))then
 		print*, "nan detected, fphiinp, f2inp=", fphiinp, f2inp 
 	end if
-	!vr2=2*(fphiinp+1d0/x-ex )-(jum*jc)**2/x**2
-	!if(vr2<=0)then
-		!print*, "fcnee"
-		!print*, "vr2=",vr2
-		!print*, "fphiinp=", fphiinp
-		!print*, "ex=",ex
-		!print*, "jum=",jum
-		!print*, "jc=",jc
-		!print*, "x=",x
+	 
+	if(aux_tmp.ne.0)then
+		vr=(2*(ra-rp)*sin(x)*cos(x))/aux_tmp
+		Ev=(vr*vr+(jum*jc)*(jum*jc)/(r*r))/(2*ex)
+		!block
+		!	real(8) vr
+		!	!call aux%print("aux")
+		!	vr=(aux_tmp/(2*(ra-rp)*sin(x)*cos(x)))**(-2)
+		!	print*, "vr=",vr
+			
+		!read(*,*)
+		!end block
+		f(1)=(f0+f2inp)*Ev*aux_tmp
+	else
+		print*, "ee:aux_tmp=0"
+		f(1)=0d0
 		!stop
-	!	f(1)=0d0
-	!else
-	!	vr=vr2**0.5d0
-		!if(x>pi/2d0-0.01d0)then
-		!	Ev=(jum*jc)**2/(2*ex*ra**2)
-		!else
-		!	Ev=(fphiinp+mbh_dmless/r)/ex-1
-		!end if
-		if(aux_tmp.ne.0)then
-			vr=(2*(ra-rp)*sin(x)*cos(x))/aux_tmp
-			Ev=(vr*vr+(jum*jc)*(jum*jc)/(r*r))/(2*ex)
-			!block
-			!	real(8) vr
-			!	!call aux%print("aux")
-			!	vr=(aux_tmp/(2*(ra-rp)*sin(x)*cos(x)))**(-2)
-			!	print*, "vr=",vr
-				
-			!read(*,*)
-			!end block
-			f(1)=(f0+f2inp)*Ev*aux_tmp
-		else
-			print*, "ee:aux_tmp=0"
-			f(1)=0d0
-			!stop
-		end if
-		!print*, "sinx^2,f1, r, vr, Ev, aux_tmp,f2inp=", sin(x)**2, f(1), r, vr, Ev, aux_tmp, f2inp
-	!end if
+	end if
+	 
 	if(ieee_is_nan(fphiinp).or.ieee_is_nan(f2inp).or.ieee_is_nan(f(1)).or.(.not.ieee_is_finite(f(1))))then
 		print*, "nan detected, fphiinp, f1inp=", fphiinp, f2inp 
 		call f1%print("f1")
@@ -852,30 +480,7 @@ contains
 	if(ieee_is_nan(f2inp).or.ieee_is_nan(f1inp))then
 		print*, "nan detected, f2inp, f1inp=", f2inp, f1inp
 	end if
-	!vr2=2*(fphiinp+1d0/x-ex)-(jum*jc)**2/x**2
-	!if(vr2<=0)then
-		!print*, "fcnjj"
-		!print*, "vr2=",vr2
-		!print*, "fphiinp=", fphiinp
-		!print*, "ex=",ex
-		!print*, "jum=",jum
-		!print*, "jc=",jc
-		!print*, "x=",x
-		!stop
-	!	f(1)=0d0
-	!else
-	!	vr=vr2**0.5d0
-		!v=(fphiinp+mbh/x-ex)**0.5d0
-	!if(x>pi/2d0-0.01d0)then
-	!	Ev=(jum*jc)**2/(2*ex*ra**2)
-	!else
-	!	Ev=(fphiinp+mbh_dmless/r)/ex-1
-	!end if
-	!if(Ev.eq.0d0)then
-	!	print*, "???Ev=0"
-	!	stop
-	!endif
-	!print*, "x,ev=",x,ev
+	 
 	vr=2*(ra-rp)*sin(x)*cos(x)/aux_tmp
 	Ev=(vr*vr+(jum*jc)*(jum*jc)/(r*r))/(2*ex)
 	!print*, "ev=",ev
@@ -926,26 +531,7 @@ contains
 	call f2%get_value_l(log10(r), f2inp)
 	!call splint_mylib(f2%xb,f2%fx,f2%y2a,f2%nbin, x, f2inp)
 	f2inp=10**f2inp
-	!call get_phi_star_full_range(fphi,log10(r),fphiinp)
-	!fphiinp=10**fphiinp
-	!if(ieee_is_nan(f2inp).or.ieee_is_nan(f1inp).or.ieee_is_nan(fphiinp))then
-	!	print*, "nan detected, f2inp, f1inp, fphiinp=", f2inp, f1inp, fphiinp
-	!end if
-	!vr2=2*(fphiinp+mbh/x-ex*ctl%v0**2)-(jum*jc)**2/x**2
-	!if(vr2<=0)then
-		!print*, "fcnej"
-		!print*, "vr2=",vr2
-		!print*, "fphiinp=", fphiinp
-		!print*, "ex=",ex
-		!print*, "jum=",jum
-		!print*, "jc=",jc
-		!print*, "x=",x
-		!stop
-	!	f(1)=0d0
-	!else
-	!	vr=vr2**0.5d0
-		!v=(fphiinp+mbh/x-ex)**0.5d0
-		!juu=jum*jc
+	 
 		f(1)=(f2inp+f0)*aux_tmp
 	!end if
 	if(ieee_is_nan(f2inp).or.ieee_is_nan(f(1)).or.(.not.ieee_is_finite(f(1))))then
@@ -1186,16 +772,7 @@ subroutine get_ffuncs_series_fast(ex,  mbhin,logr, jum, jc, ra,rp, spp, func, re
 		t1=0
 	end if
 	
-	dint=px*(t1**(ipow+1)-t0**(ipow+1))-qx*(t1**(ipow+2)-t0**(ipow+2))!
-	!	print*, "logx0,logx1,xmin,xmax,x=",logx0,logx1,logxmin,logxmax,ex
-	!	print*, "a-1,t0,t1=",ratio-1,t0,t1,ratio-10**logx0/ex,ratio-10**logx1/ex
-	!	print*, "1=", px*t1**(ipow+1),1d0/(ipow+1)*(line_slope*ratio*ex+line_c)*(ratio-10**logx0/ex)**(ipow+1)/(ratio-1)**ipow
-	!	print*, "2=", px*t0**(ipow+1),1d0/(ipow+1)*(line_slope*ratio*ex+line_c)*(ratio-10**logx1/ex)**(ipow+1)/(ratio-1)**ipow
-	!	print*, "3=", qx*t1**(ipow+2),1d0/(ipow+2)*line_slope*ex*(ratio-10**logx0/ex)**(ipow+2)/(ratio-1)**ipow
-	!	print*, "4=", qx*t0**(ipow+2),1d0/(ipow+2)*line_slope*ex*(ratio-10**logx1/ex)**(ipow+2)/(ratio-1)**ipow
-	!if(ratio-1<1d-6)then
-	!	read(*,*)
-	!end if
+	dint=px*(t1**(ipow+1)-t0**(ipow+1))-qx*(t1**(ipow+2)-t0**(ipow+2))! 
 	if(dint<0)then
 		dint=0
 	end if
@@ -1216,15 +793,7 @@ subroutine get_ffuncs_series_fast(ex,  mbhin,logr, jum, jc, ra,rp, spp, func, re
 	else
 		res=log10(res_tmp)
 	end if
-	!print*, "res_tmp=", res_tmp, px*(tmax**(ipow+1)-tmin**(ipow+1))-qx*(tmax**(ipow+2)-tmin**(ipow+2))
-	!block
-	!	real(8) term1,term2,term3
-	!	term1=1d0/(ipow+1)*ratio**2*ex**2*(ratio-1)
-	!	term2=1d0/(ipow+3)*(ratio-1)**3*ex**2
-	!	term3=-2d0/(ipow+2)*(ratio-1)**2*ratio*ex**2
-	!print*, "res_tmp=", res_tmp, term1*tmax**(ipow+1)+term2*tmax**(ipow+3)+term3*tmax**(ipow+2)-&
-	!		(term1*tmin**(ipow+1)+term2*tmin**(ipow+3)+term3*tmin**(ipow+2))
-	!!read(*,*)
+	!print*, "re 
 	!end block
 	if(ieee_is_nan(res))then
 		print*, "nan detected get_ffuncs_series_fast"
@@ -1254,18 +823,7 @@ subroutine get_ffuncs_series(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func, res, 
 	real(8) ex,exmax,exmin,logr,fout,ratio,res,ra,rp
 	real(8) ipow,yout,mbhin,tmin,tmax,fx_tmp,xmin,xmax
 	integer debug
-	integer idid,i
-	!print*, "/?0"
-	!stop
-	!call get_value_at_x_fc(fphi,r,yout,1)
-	!call fphi%get_value_l(logr, yout)
-	!block
-	!	use com_main_gw
-	!	call dms%mb(1)%star%barge%print("g(x)")
-	!	print*, "emin_factor, emax_factor=", emin_factor, emax_factor
-	!end block
-	!logr=log10(rp+(ra-rp)*sin(theta)**2)
-	!debug=1
+	integer idid,i 
 	
 	call get_phi_star_full_range(spp,logr, yout)
 
@@ -1349,26 +907,7 @@ subroutine get_ffuncs_series(ex, exmax,exmin,mbhin,logr, ra,rp, spp, func, res, 
 		read(*,*)
 	end if
 
-	if(fout<=0)then
-		!print*, "fout<=0",fout
-		!print*, "ratio,logr=",ratio, logr
-		!print*, "phi_star, ex=", yout, ex
-		!stop
-		!print*, "corrected, ratio, logr, fout=", ratio, logr,fout 
-		!block
-		!	use com_main_gw
-		!	real(8) fxt
-		!	print*, "fout=",fout
-		!	call func(ex,fxt)
-		!	print*, "ex,f(ex)=", ex, fxt
-		!	call func(ex*ratio,fxt)
-		!	print*, "ex*ratio,f(ratio*ex)=",ex*ratio, fxt
-		!	call dms%mb(1)%all%barge%print("gx")
-		!	debug=1
-		!	fout=0
-		!	call my_integral_none(0d0,1d0,fout,fcn_y,idid)
-		!	read(*,*)
-		!end block
+	if(fout<=0)then 
 
 		res=-100
 		return
@@ -1516,106 +1055,7 @@ contains
 		
 	end subroutine
 end subroutine
-
-
-subroutine mb_get_dc_mpi_starpt_gx_regular(mb,spp)
-    use com_main_gw
-    implicit none
-    type(mass_bins),target::mb
-    real(8),allocatable:: e_110(:,:),e_0(:,:),ee(:,:)
-	real(8),allocatable:: j_111(:,:),j_rest(:,:),jj(:,:),ej(:,:)
-    real(8),allocatable:: ycenter(:),xcenter(:)
-    integer n,i,j
-    type(coeff_type)::cej
-    real(8) kappa, sigma32, n0,lambda
-	!type(s1d_type)::phi_star
-	type(s1d_type)::common_gx
-	type(star_pot_para)::spp
-	interface 
-		subroutine get_coeff_ej_spt_y_gx_regular(xb, yb, n, spp,barge,asymp, e_110,e_0,ee,j_111,j_reset,jj,ej)
-			use com_main_gw
-			implicit none
-			!type(s1d_type)::phi_star
-			type(star_pot_para)::spp
-			integer n,i,j
-			type(coeff_type)::ceo_ej
-			real(8) xb(n),yb(n)
-			real(8) e_110(n,n),e_0(n,n),ee(n,n) 
-			real(8) j_111(n,n),j_reset(n,n),jj(n,n),ej(n,n)
-			type(s1d_type),target::barge
-			real(8) asymp
-		end subroutine
-		
-	end interface
-	!print*, "start mb get dc"
-    n=mb%df_coe_bins
-	!print*, "n=", n
-    allocate(ycenter(n),xcenter(n))
-    allocate(e_110(n,n),e_0(n,n),ee(n,n), &
-			j_111(n,n),j_rest(n,n),jj(n,n),ej(n,n))
-    select case(mb%dc%jbin_type) 
-    case(jbin_type_log)
-        ycenter=10**mb%dc%s2_de_110%ycenter    
-	 
-	case default
-		print*, "error! define jbin_type_lin", mb%dc%jbin_type
-		stop
-    end select
-
-	!call get_ffuncs(phi_star,10**mb%dc%s2_dj%xcenter,  &
-	!	f0,f1,f2,n,mb%all%barge,mb%all%asymp)
-	select case(ctl%ebin_type)
-	case(ebin_type_log)
-		xcenter=10**mb%dc%s2_de_110%xcenter 
-	end select
-	!print*, "xcenter=",xcenters
-	call get_lambda(lambda)
-    kappa=(4*pi*mb%mc)**2*lambda!*factor
-	!print*, "kappa=",kappa
-    !====================test=========================
-    !kappa=(4*pi*mb%mc)**2*log(mb%mtot/mb%mc)!*factor
-    !=================================================
-
-    sigma32=(2*pi*mb%v0**2)**(-3/2d0)
-    n0=mb%n0
-	!print*, "ctl%dejmodel=",ctl%dejmodel
-    select case(ctl%Dejmodel)
-	case(dejmodel_EJ) 
-		common_gx=mb%all%barge
-		call get_none_zero_s1d(mb%all%barge,common_gx)
-
-		call get_coeff_ej_spt_y_gx_regular(xcenter, ycenter,n,spp,&
-				common_gx,mb%all%asymp, e_110,e_0,ee,j_111,j_rest,jj,ej)
-		mb%dc%s2_de_110%fxy=e_110*sigma32*n0*kappa
-		mb%dc%s2_de_0%fxy=e_0 *sigma32*n0*kappa
-		mb%dc%s2_dee%fxy=ee*sigma32*n0*kappa
-		mb%dc%s2_dj_111%fxy=j_111 *sigma32*n0*kappa
-		mb%dc%s2_dj_rest%fxy=j_rest *sigma32*n0*kappa
-		mb%dc%s2_djj%fxy=jj*sigma32*n0*kappa
-		mb%dc%s2_dej%fxy=ej*sigma32*n0*kappa
-		!print*, sigma32*n0*kappa
-		!stop
-	case(dejmodel_xj)
-		do i=1, n
-			do j=1, n
-				!call get_coeff_xj(cej,ycenter(j), &
-				!s0(i,j), s110(i,j), &
-				!s111(i,j),s131(i,j),s130(i,j),s13_1(i,j),s330(i,j),s310(i,j))
-
-				mb%dc%s2_de_110%fxy(i,j)=cej%e_110*sigma32*n0*kappa
-				mb%dc%s2_de_0%fxy(i,j)=cej%e_0 *sigma32*n0*kappa
-				if(cej%ee<0d0) cej%ee=abs(cej%ee)
-				mb%dc%s2_dee%fxy(i,j)=cej%ee*sigma32*n0*kappa
-				mb%dc%s2_dj_111%fxy(i,j)=cej%j_111 *sigma32*n0*kappa
-				mb%dc%s2_dj_rest%fxy(i,j)=cej%j_rest *sigma32*n0*kappa
-				if(cej%jj<0d0) cej%jj=abs(cej%jj)
-				mb%dc%s2_djj%fxy(i,j)=cej%jj*sigma32*n0*kappa
-				mb%dc%s2_dej%fxy(i,j)=cej%ej*sigma32*n0*kappa
-			end do
-		end do
-	
-	end select
-end subroutine
+ 
 
 subroutine mb_get_dc_mpi_starpt_gx_iregular(mb,spp)
     use com_main_gw

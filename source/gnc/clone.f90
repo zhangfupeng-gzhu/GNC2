@@ -109,8 +109,7 @@ subroutine clone_scheme(pt, en0, en1, amplifier,time, out_flag_clone)
         ctl%num_clone_created=ctl%num_clone_created+amplifier**nl-1
         out_flag_clone=1
         if(ctl%chattery.ge.4) write(*,*) "-------clone particle--",lvl,pt%idx, pt%ed%idx
-    end if	
-    !if(ctl%chattery.ge.3) print*, "???????", ctl%del_cross_clone
+    end if	 
     if(ctl%del_cross_clone.ge.1)then
         !if(ctl%chattery.ge.3)then
         !    print*," nhiar, lvl=", sample%source,lvl

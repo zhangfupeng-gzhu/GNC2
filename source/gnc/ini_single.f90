@@ -34,9 +34,7 @@ contains
 					fmax=max(fmax,fx_tmp(i))
 				end if
 			end do
-		else
-			! if(allocated(fx_tmp))deallocate(fx_tmp)
-			! allocate(fx_tmp(ctl%ini_nx_tot%nbin))
+		else 
 			do i=1, ctl%ini_nx_tot%nbin
 				fx_tmp(i)=10**ctl%ini_nx_log(midx)%fx(i)
 			end do
@@ -139,10 +137,9 @@ subroutine get_init_samples(bksps_arr_ini)
 	end do
 	
 	if(rid.eq.0)then
-		write(unit=*,fmt="(A4, 12A15)") "", "NStar", "NSbh", "NNs", "NWd", "NBd" 
+		write(unit=*,fmt="(A4, 12A15)") "", "NStar", "NSbh", "NNs", "NWd", "NBd", "Nrg"
 		write(*, fmt="(A4,10I15)") "TOT=", ctl%ini_stellar_tot(1:6)
-		do i=1, ctl%m_bins
-			!write(unit=tmpj,fmt="(I4)") tmpj
+		do i=1, ctl%m_bins 
 			write(*, fmt="(I4,20I15)") i,ctl%ini_stellar_each_mass(1:6,i)
 		end do
 		print*, "start bksps_ini", nsg_tot

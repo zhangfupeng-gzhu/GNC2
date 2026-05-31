@@ -171,22 +171,16 @@ module model_basic
 		integer Dejmodel, include_loss_cone 
 		integer num_get_sample_para_exact, num_get_sample_para_kpl, num_of_loops,num_of_lc
 		integer model_intej
-		integer i_spshot_bg_last
-        integer by_sp_num          !by_sp_num<10
-		integer collision_estimate_method
-        integer consider_mass_precession_in_kl
-		integer threebody_PNorder(4)  !1=PN1, 2=PN2, 3=PN2.5, 4=tidal drag force
+		integer i_spshot_bg_last 
 		integer::binary_3body_encounter, include_bhb_mbh_3body 
 		integer::same_rseed_evl, same_rseed_ini	
 		integer::gw_radiation_otby 
-		integer::output_gw_emri_data_bin
-		integer::binary_KL, bysn_otbycorr
+		integer::output_gw_emri_data_bin 
 		integer::clone_scheme, del_exit_min
 		integer::trace_all_sample  
 		integer::all_exact
 		integer::include_stellar_evolution
-		integer::init_adb_mbh_inc
-		!integer::varying_r_ranges
+		integer::init_adb_mbh_inc 
 		integer::two_body_relaxation_on
 
 		integer stellar_collision_pair_mode
@@ -200,31 +194,23 @@ module model_basic
 		integer::collection_data_method
         integer burn_in_snap
 		integer jbin_type,ebin_type
-		integer idxstar, idxsbh, idxbbh, idxmsb, idxns, idxwd,idxbd,idxrg, idxdm, idxnHe
-		!integer include_star_potential
-		!integer adbatic_correction
+		integer idxstar, idxsbh, idxbbh, idxmsb, idxns, idxwd,idxbd,idxrg, idxdm, idxnHe 
 		integer barge_grid_type
 		integer dc_grid_type
 		integer barge_evl_method
 		integer adb_est_method
-		integer ini_mass_bin_mode
-		!contains
-		!procedure,nopass::get_num_within, get_mass_avg
+		integer ini_mass_bin_mode 
 		integer method_interpolate
 		!integer::npar_sam_tot
 		integer::m_bins ! number of mass bin
 		integer::diff_coeff_bins ! for diffusion coefficients
 		integer::dstr_bins_r       ! for other 1D distribution functions of r
-		integer::dstr_bins_e       ! for other 1D distribution functions of e
-		!integer::dstr_bins_e_amplifier
-		integer::sample_dstr_nx ! for gxj_ir
+		integer::dstr_bins_e       ! for other 1D distribution functions of e 
 		integer::dstr_bins_j ! for gxj_ir
         integer::idx_ref
         !integer::consider_merge_kicks
 		integer:: debug=0
-        integer:: ini_sample_sg_mode, ini_sample_by_mode
-        integer:: bin_mass_flux_in(20,4)=0  ! 1=star, 2=sbh, 3= bbh, 4=bstar
-        integer:: bin_mass_flux_out(20,4)=0  ! 1=star, 2=sbh, 3= bbh, 4=bstar
+        integer:: ini_sample_sg_mode  
         integer:: bin_mass_emax_out(20,4)=0
 		integer:: chattery ! <=2, normal; =3, add tdial details
         integer:: ntasks, ntask_total 
@@ -261,8 +247,7 @@ module model_basic
 	type(diffuse_mspec),target::dms 
 	
     integer,parameter:: chattery_out_unit_0=1383829393
-    integer chattery_out_unit 
-    real(8),allocatable::lambda_aux(:)
+    integer chattery_out_unit  
     real(8),parameter::my_unit_vel_c5=my_unit_vel_c**5
 	real(8)::dc_grid_xstep, dc_grid_ystep
 	 
@@ -279,53 +264,31 @@ module model_basic
 	integer::max_self_con_iter=15
 
 	real(8)::gx_func_max_step=10
-	real(8)::gx_func_min_step=0.05 
-	!real(8),allocatable::weight_collision_by(:) 
-	real(8) clone_e0_factor     !the reference postion of energy
-	real(8) clone_e0_factor_input     !the reference postion of energy
-!	real(8) entering_frequency
-	!real(8),parameter::emax_neg=-1d0
-	!integer,parameter::emax_neg_rxn=10
+	real(8)::gx_func_min_step=0.05  
+	real(8) clone_e0_factor     
+	real(8) clone_e0_factor_input 
 	real(8):: clone_emax
 	real(8)::jmin_value, jmax_value
 	real(8)::log10jmin_value,log10jmax_value
 	
-	real(8)::emin_value, emax_value
-	!real(8)::log10emin_value,log10emax_value
+	real(8)::emin_value, emax_value 
 	real(8) nx_exmax, nx_logemin,nx_logemax 
 
 	integer,parameter:: fden_ana_est_method_1d_iso=1, fden_ana_est_method_2d=2
-	integer,parameter:: timestep_mode_tnr=1, timestep_mode_trh=2
-
-	integer,parameter::stellar_collision_pair_mode_all=1   ! collision between all kinds of stellar object
-	integer,parameter::stellar_collision_pair_mode_self=2  ! collision only between the same type of stellar object
-	integer,parameter::stellar_collision_method_simple=1
-	integer,parameter::stellar_collision_method_scope=2
+	integer,parameter:: timestep_mode_tnr=1, timestep_mode_trh=2 
 
 	integer,parameter::ini_mass_bin_mode_given=1, ini_mass_bin_mode_kroupa=2, ini_mass_bin_mode_pow=3
 	integer,parameter::ini_mass_bin_mode_topheavy=4
 
-	integer,parameter:: get_dc_method_fast=1,get_dc_method_general=2,get_dc_method_sqr=3
-	integer,parameter:: evl_idx_star_td=1, evl_idx_star_lc=2
-	integer,parameter:: evl_idx_emax=3, evl_idx_bh_emri=4, evl_idx_bh_lc=5
-	integer,parameter:: evl_idx_bd_lc=6,   evl_idx_ns_lc=7, evl_idx_wd_lc=8
-	integer,parameter:: evl_idx_scd_star=9, evl_idx_scd_rg=10
-
-	integer,parameter:: evl_idx_reservoir_td_star=1
-	integer,parameter:: evl_idx_reservoir_td_rg=2
-	integer,parameter:: evl_idx_reservoir_scd_star=3
-	integer,parameter:: evl_idx_reservoir_scd_rg=4
+	integer,parameter:: get_dc_method_fast=1,get_dc_method_general=2 
+  
 	
-	integer,parameter::source_simu=2, source_ana=1
-	!integer:: =source_simu
-	!integer:: source_fden=source_ana
-	integer,parameter::barge_grid_type_iregular_barp=2, barge_grid_type_regular=1
+	integer,parameter::source_simu=2, source_ana=1 
 	integer,parameter::barge_grid_type_iregular_phi=3!, barge_grid_type_iregular_z=4
 	integer,parameter::barge_grid_type_iregular_jc=5
 	integer,parameter::ini_den_model_dehnen=1, ini_den_model_plummer=2
 	integer,parameter:: barge_evl_method_direct=1
-	integer,parameter:: barge_evl_method_grid_2d=3 
-	integer,parameter:: dc_grid_regular=1
+	integer,parameter:: barge_evl_method_grid_2d=3  
 	integer,parameter:: dc_grid_irregular=2 
 	integer,parameter::adb_est_method_fast=2, adb_est_method_acc=1 
 

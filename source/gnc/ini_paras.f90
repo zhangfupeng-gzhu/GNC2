@@ -44,9 +44,7 @@ subroutine apply_paras()
 				
 			case("diffusion coefficient bin type")
 				read(unit=pvalue,fmt=*) ctl%str_dc_grid_type
-				select case(trim(adjustl(ctl%str_dc_grid_type)))
-				case("REG")
-					ctl%dc_grid_type=dc_grid_regular
+				select case(trim(adjustl(ctl%str_dc_grid_type))) 
 				case("IREG")
 					ctl%dc_grid_type=dc_grid_irregular
 				case default

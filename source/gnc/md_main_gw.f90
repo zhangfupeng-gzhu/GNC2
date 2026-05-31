@@ -315,8 +315,7 @@ contains
             print*, "coeNr%jj,Period=", coeNr%jj,Period
             print*, "sample%jm, jph=",sample%jm,sample%jph
              
-            print*, "sample%byot%a_bin,ec, period=",sample%byot%a_bin,sample%byot%e_bin, period
-            print*, "lambda_aux=",lambda_aux
+            print*, "sample%byot%a_bin,ec, period=",sample%byot%a_bin,sample%byot%e_bin, period 
             read(*,*)
         end if
         if(ctl%chattery.ge.4)then

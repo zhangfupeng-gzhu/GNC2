@@ -1,8 +1,6 @@
 module md_mobse_stellar_single
     use com_sts_type
-    implicit none
-     
-
+    implicit none 
 	integer,parameter::mobse_ktype_fcms=0
 	integer,parameter::mobse_ktype_ms=1
 	integer,parameter::mobse_ktype_bh=14
@@ -15,9 +13,7 @@ module md_mobse_stellar_single
 	integer,parameter::mobse_ktype_hewd=10
 	integer,parameter::mobse_ktype_cowd=11
 	integer,parameter::mobse_ktype_onwd=12 
-contains 
- 
- 
+contains  
 	character*(5) function get_kstar_type(ktype)
 		implicit none
 		integer ktype
