@@ -108,8 +108,7 @@ stellar_obj.o: coeff.o md_bk_particle.o
 dms.o: coeff.o md_by_particle.o md_bk_particle.o stellar_obj.o  chain_type.o
  
  
-modules.o: chain_type.o  dms.o md_by_particle.o  \
-	 mobse_stellar.o md_iso.o   chain_type.o
+modules.o: chain_type.o  dms.o md_by_particle.o  mobse_stellar.o md_iso.o   chain_type.o
 
 MPI_comu.o : modules.o  
  

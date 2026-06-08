@@ -225,8 +225,7 @@ module model_basic
 	end type
 	!type(ini_par_type)::ipt
 
-	type(control_type),target::ctl
-	type(chain_type)::BYsams  ! includes only by samples
+	type(control_type),target::ctl 
     type(chain_type)::Allsams
 
 	type(particle_samples_arr_type)::bksams_arr_ini
@@ -236,10 +235,9 @@ module model_basic
 
 	type(particle_samples_arr_type):: bkstars_arr 
 	type(particle_samples_arr_type):: bksbhs_arr
-	type(particle_samples_arr_type):: bksbhs_arr_norm
-	type(particle_samples_arr_type):: bksbhs_arr_gwcapture
+	type(particle_samples_arr_type):: bksbhs_arr_norm 
 	type(particle_samples_arr_type),target:: bksams_arr_norm   ! only normal samples
-	type(particle_samples_arr_type),target:: bksams_arr_emin   ! only exit to emin samples
+	! type(particle_samples_arr_type),target:: bksams_arr_emin   ! only exit to emin samples
 	type(particle_samples_arr_type),target:: bksams_arr_norm_sbh
 	type(particle_samples_arr_type):: bksams_arr    ! include all samples
 	type(particle_samples_arr_type):: bksams_arr_merge  ! due to gw capture   

@@ -11,9 +11,9 @@ subroutine get_mbh_increase(dmbh_tot)
     call get_mass_mbh_growth(bksams,ctl%run_snap_time_inner_steps_i)
     if(rid.eq.0)then
         print*, "mbh mass increasement"
-        write(unit=*,fmt="(20A12)") "TD", "LC(star)","LC(SBH)", "EMAX(SBH)", "EMRI(SBH)", "Std(MS)", "Std(RG)"
+        write(unit=*,fmt="(20A12)") "TD", "LC(star)","LC(SBH)", "EMAX(SBH)", "EMRI(SBH)"
         write(unit=*,fmt="(1P20E12.3)") mbh_mmg%td_disc(1), mbh_mmg%lc_direct(1:2),mbh_mmg%emax_direct(2), &
-        mbh_mmg%emri(2), mbh_mmg%stc_disc(1),mbh_mmg%stc_disc(6)
+        mbh_mmg%emri(2)
     end if
     if(rid.eq.0)then
         print*, "gas_resurvior_now=",  mbh_mmg%gas_reservior_left

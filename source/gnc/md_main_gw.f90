@@ -87,11 +87,7 @@ contains
         real(8) time
         integer amplifier
         pe=>pt%ed
-        call pt%ed%create_chain(amplifier-1)
-		!print*, "nodes created:cl"
-        !print*, "create_chain clone"
-        !call bysams%output_screen()
-        !read(*,*)
+        call pt%ed%create_chain(amplifier-1) 
         pt%ob%weight_real=pt%ob%weight_real/amplifier
         pt%ob%weight_clone=pt%ob%weight_clone/amplifier
         pt%ob%Lvl_clone=pt%ob%Lvl_clone+1
@@ -581,61 +577,4 @@ subroutine set_star_spin_random(pr)
         pr%spin=0d0
     end select
 end subroutine
-  
-real(8) function get_denergy(mt, mp, rt,rper, obt)
-    use com_main_gw
-    implicit none
-    real(8) mt, mp, rt,rper
-    integer obt
-    real(8) eta, teta,x
-  !  de=0
-    get_denergy=0
-    select case(obt)
-    case(star_type_MS)
-        eta=(mt/(mt+mp))**0.5d0*(rper/rt)**1.5d0
-        x=log10(eta)
-        if(x<1)then
-            teta=-1.124+0.877*x-13.37*x**2+21.55*x**3 &
-                -16.48*x**4+4.124*x**5
-            get_denergy=mp**2*rt**5/rper**6*10**teta
-        else
-           ! print*, "warnning:logeta>1", x, mt, mp
-            !stop
-        end if
-    !    print*, "eta, teta, rt, rper=", eta, teta, rt, rper
-    !    etaindex=3
-    case(star_type_WD)
-    !    etaindex=1.5
-        eta=(mt/(mt+mp))**0.5d0*(rper/rt)**1.5d0
-        x=log10(eta)
-        if(x<1)then
-            x=log10(eta)
-            teta=-0.397+1.678*x+1.277*x**2-12.42*x**3 &
-                +9.446*x**4-5.55*x**5
-            get_denergy=mp**2*rt**5/rper**6*10**teta
-        else
-          !  print*, "warnning:logeta>1", x, mt, mp
-            !stop
-        end if
-    case(star_type_BH, star_type_NS)
-        get_denergy=0d0
-    case default
-        print*, "get_denergy:star_type:", obt
-        stop
-    end select 
-end function 
-subroutine input_particle_sample_arr_mpi(smsa, n, fdir, str_snap, str_update)
-	use com_main_gw
-	integer n
-	type(particle_samples_arr_type)::smsa(n)
-	character*(*) str_snap, str_update, fdir
-	character*(400) filename
-	character*(5) tmprid
-	integer i
-	do i=1, n
-		write(unit=tmprid, fmt="(I5)") i
-		filename=trim(adjustl(fdir))//trim(adjustl(tmprid))//"_"//trim(adjustl(str_snap))//& 
-				"_"//trim(adjustl(str_update))
-		call input_particle_sams_arr_bin(smsa(i),trim(adjustl(filename)))
-	end do
-end subroutine
+    

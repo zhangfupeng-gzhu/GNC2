@@ -12,39 +12,7 @@ subroutine get_fxj0(dm)
    ! print*, dm%mb(1)%star%nxj%nxyw(:,3)
 	call get_fxj(dm, dm%all,dm%jbin_type)
 end subroutine
-
-subroutine get_fxr0_ir(dm)
-	use com_main_gw
-	implicit none
-	type(diffuse_mspec)::dm
-	integer i,j,k,l
-
-!	do i=1, dm%n
-!		call get_fxr_ir(dm,dm%mb(i))
-!        associate(mb=>dm%mb(i))
-!            mb%all%gxr_ir
-!            mb%all%gxr_ir%fxy=0
-!            do j=1, mb%all%gxr_ir%nx
-!                do k=1, mb%all%gxr_ir%ny
-!                    do l=1, n_tot_comp
-!                        mb%all%gxr_ir%fxy(j,k)=mb%all%gxr_ir%fxy(j,k)+mb%dsp(l)%p%gxr_ir%fxy(j,k)
-!                    end do
-!                end do 
-!            end do
-!        end associate
-!	end do
-!    do j=1, n_tot_comp
-!        dm%all%dsp(j)%p%gxr_ir%fxy=0
-!    end do
-!    dm%all%all%gxr_ir%fxy=0
-!    
-!    do i=1, dm%n
-!        do j=1, n_tot_comp
-!            dm%all%dsp(j)%p%gxr_ir%fxy=dm%all%dsp(j)%p%gxr_ir%fxy+dm%mb(i)%dsp(j)%p%gxr_ir%fxy
-!        end do
-!        dm%all%all%gxr_ir%fxy=dm%all%all%gxr_ir%fxy+dm%mb(i)%all%gxr_ir%fxy
-!    end do    
-end subroutine
+ 
 
 subroutine get_fxj0_ir(dm)
 	use com_main_gw
@@ -412,8 +380,7 @@ subroutine get_cluster_density(dm)
         print*, "logrmin,logrmax=",logrmin,logrmax
     end if
     call get_rho_rmax()
-    call init_stellar_obj_rtables(dm)
-    call get_fxr0_ir(dm)
+    call init_stellar_obj_rtables(dm) 
     if(ctl%chattery.ge.2.and.rid.eq.0)then
         print*, "start get_dens0"
     end if
@@ -740,16 +707,7 @@ subroutine gen_nxj_fxj_gx_iregular(dm,spp)
         call get_nxj_ir(dm)
         !print*, "4"
         call get_fxj0_ir(dm)
-        
-        !do i=1, ctl%ntasks
-        !    call mpi_barrier(mpi_comm_world,ierr)
-        !    if(rid.eq.i-1)then
-        !        !call so%gxj_ir%print("gxj_ir")
-        !        print*, "rid,star%nxj_ir%last=",rid,dm%mb(1)%star%nxj_ir%fxy(dm%mb(1)%star%nxj_ir%nx,:)
-        !        print*, "rid,star%gxj_ir%last=",rid,dm%mb(1)%star%gxj_ir%fxy(dm%mb(1)%star%gxj_ir%nx,:)
-        !    end if
-        !    call mpi_barrier(mpi_comm_world,ierr)
-        !end do
+         
         call get_barge0(dm)
     else
         call set_gx_nx_ranges_ir(dm)
@@ -924,11 +882,7 @@ subroutine update_arrays_single(clean_after)
 	call convert_sams_pointer_arr(bksams, bksams_pointer_arr,type=1)
     !print*, "4"
 	call bksams_arr%select(bksams_arr_norm, exit_normal, -1, -1d0, -1d0)
-    print*, "bksams_arr_norm%n=", bksams_arr_norm%n,rid
-    !print*, "bksams_arr_norm%type=",bksams_arr_norm%sp(1:10)%obtype
-    !print*, bksams_arr_norm%sp(1:10)%byot%ms%obtype
-    call bksams_arr%select(bksams_arr_emin, exit_boundary_min, -1, -1d0, -1d0)
-    !print*, "bksams_arr_emin%n=", bksams_arr_emin%n,rid
+    print*, "bksams_arr_norm%n=", bksams_arr_norm%n,rid 
     if(clean_after)then
         if(allocated(bksams_arr%sp))deallocate(bksams_arr%sp)
     end if

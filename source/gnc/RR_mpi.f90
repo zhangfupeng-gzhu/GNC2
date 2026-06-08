@@ -25,10 +25,7 @@ IMPLICIT NONE
 		type(chain_type)::ch
 		integer flag
 	end subroutine
-	end interface
-	!integer,parameter::imax_trace=10000
-	!integer i_trace
-	!if(rid.eq.0)then
+	end interface 
 		call cpu_time(t1)
 	!end if
     if(ctl%chattery.ge.1)then
@@ -36,7 +33,7 @@ IMPLICIT NONE
     end if
 	if(rid.eq.mpi_master_id)then
 		write(chattery_out_unit,*) "simu begin"
-		if(ctl%chattery.ge.1) write(chattery_out_unit,fmt=*) "total number of samples:", bksams%n, bysams%n
+		if(ctl%chattery.ge.1) write(chattery_out_unit,fmt=*) "total number of samples:", bksams%n 
 		if(ctl%chattery.ge.1) write(chattery_out_unit,fmt=*) "total time:", total_time,"Myr"
 		if(ctl%chattery.ge.1) write(chattery_out_unit,fmt=*) "total number of procs:", ctl%ntasks
 	end if
@@ -83,23 +80,9 @@ loop1:	do while(associated(pt))
 					pt%ob%write_down_track=0
 				end if
 				
-			end select
-			!block
-			!	real(8) wsi
-			!	if(pt%ob%obtype.eq.star_type_BH)then
-			!		call get_wsi(mbh_spin, pt%ob%byot%Inc,wsi)
-			!		print*, "inc,wsi=", pt%ob%byot%Inc,wsi
-			!	end if
-			!end block
-			!if(pt%ob%id.eq.904708)then
-			!	pt%ob%write_down_track=1
-			!else
-			!	pt%ob%write_down_track=0
-			!end if
-			call run_one_sample(pt,total_time)
-			! call check("after run_one_sample")
-		end if
-        !call check("before delete in RRMPI")
+			end select 
+			call run_one_sample(pt,total_time) 
+		end if 
         ps=>pt
         pt=>pt%next
         !print*, "1"
@@ -145,9 +128,7 @@ subroutine delete_some_samples(ps,pt,ch,flag)
 	type(chain_pointer_type),pointer::pt,ps
 	integer flag
 	type(chain_type)::ch
-	
-	!print*, "associated(ps)?",associated(ps), ps%ob%exit_flag
-	!call delete_clone_particle(pt%prev)
+	 
 	if(associated(ps%prev))then
 		if(allocated(ps%ob))then
 			deallocate(ps%ob)
@@ -169,21 +150,7 @@ subroutine delete_some_samples(ps,pt,ch,flag)
 		call pt%set_head()     
 		!print*, "delete the fisrt node",rid
 		pt%prev=>null()
-		
-		!print*, ch%head%ob%id
-		!call ch%output_screen(2,10)
-		!print*, "2"
-		!if(allocated(sp%ob).and.allocated(pt%ob))then
-		!    sp%ob=pt%ob
-		!    sp%idx=pt%idx
-		!    deallocate(pt%ob)
-		!    call chain_pointer_delete_item_chain_type(pt)
-		!    pt=>sp
-		!    print*, "error! the head !"
-		!else
-		!    print*, "error!"
-		!    stop
-		!end if
+		 
 		
 	end if
 

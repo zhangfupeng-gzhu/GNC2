@@ -15,9 +15,7 @@ module md_mbh_evl_acc
         real(8) td_direct_acum(1:n_tot_comp_sg)
 
         real(8) td_disc(1:n_tot_comp_sg)
-        real(8) td_disc_acum(1:n_tot_comp_sg)
-        real(8) stc_disc(1:n_tot_comp_sg) !stellar collision to disc
-        real(8) stc_disc_acum(1:n_tot_comp_sg) !stellar collision to disc
+        real(8) td_disc_acum(1:n_tot_comp_sg) 
         real(8) emri(1:n_tot_comp_sg)
         real(8) emri_acum(1:n_tot_comp_sg)
 
@@ -64,11 +62,7 @@ contains
         idx_starter=idx_starter+n_tot_comp_sg
         fx(idx_starter+1:idx_starter+n_tot_comp_sg)=mmg%td_disc
         idx_starter=idx_starter+n_tot_comp_sg
-        fx(idx_starter+1:idx_starter+n_tot_comp_sg)=mmg%td_disc_acum
-        idx_starter=idx_starter+n_tot_comp_sg
-        fx(idx_starter+1:idx_starter+n_tot_comp_sg)=mmg%stc_disc
-        idx_starter=idx_starter+n_tot_comp_sg
-        fx(idx_starter+1:idx_starter+n_tot_comp_sg)=mmg%stc_disc_acum
+        fx(idx_starter+1:idx_starter+n_tot_comp_sg)=mmg%td_disc_acum 
         idx_starter=idx_starter+n_tot_comp_sg
         fx(idx_starter+1:idx_starter+n_tot_comp_sg)=mmg%emri
         idx_starter=idx_starter+n_tot_comp_sg
@@ -104,13 +98,7 @@ contains
         mmg%td_disc=fx(idx_starter+1:idx_starter+n_tot_comp_sg)
 
         idx_starter=idx_starter+n_tot_comp_sg
-        mmg%td_disc_acum=fx(idx_starter+1:idx_starter+n_tot_comp_sg)
-
-        idx_starter=idx_starter+n_tot_comp_sg
-        mmg%stc_disc=fx(idx_starter+1:idx_starter+n_tot_comp_sg)
-
-        idx_starter=idx_starter+n_tot_comp_sg
-        mmg%stc_disc_acum=fx(idx_starter+1:idx_starter+n_tot_comp_sg)
+        mmg%td_disc_acum=fx(idx_starter+1:idx_starter+n_tot_comp_sg) 
 
         idx_starter=idx_starter+n_tot_comp_sg
         mmg%emri=fx(idx_starter+1:idx_starter+n_tot_comp_sg)
@@ -128,7 +116,7 @@ contains
         class(mass_mbh_growth)::mmg
         call init_mass_mbh_growth_in_one_snap(mmg)
         mmg%lc_direct_acum=0; mmg%td_direct_acum=0; 
-        mmg%td_disc_acum=0; mmg%stc_disc_acum=0
+        mmg%td_disc_acum=0; 
         mmg%emri_acum=0; mmg%emax_direct_acum=0
         mmg%gas_reservior_add_acum=0
         mmg%mass_direct_swallow_acum=0
@@ -138,8 +126,7 @@ contains
     subroutine init_mass_mbh_growth_in_one_snap(mmg)
         implicit none
         class(mass_mbh_growth)::mmg
-        mmg%lc_direct=0; mmg%td_direct=0; mmg%td_direct=0; 
-        mmg%td_disc=0; mmg%stc_disc=0; 
+        mmg%lc_direct=0; mmg%td_direct=0; mmg%td_direct=0;  
         mmg%emri=0; mmg%emax_direct=0; 
         mmg%gas_reservior_add=0
         mmg%mass_direct_swallow=0
@@ -152,8 +139,7 @@ contains
         mmg%lc_direct_acum=mmg%lc_direct_acum+mmg%lc_direct
         mmg%td_direct_acum=mmg%td_direct_acum+mmg%td_direct
         mmg%td_disc_acum=mmg%td_disc_acum+mmg%td_disc
-        mmg%td_direct_acum=mmg%td_direct_acum+mmg%td_direct
-        mmg%stc_disc_acum=mmg%stc_disc_acum+mmg%stc_disc
+        mmg%td_direct_acum=mmg%td_direct_acum+mmg%td_direct 
         mmg%emax_direct_acum=mmg%emax_direct_acum+mmg%emax_direct
         mmg%emri_acum=mmg%emri_acum+mmg%emri
         mmg%mass_loss_stellar_evolution_acum=mmg%mass_loss_stellar_evolution_acum &
@@ -163,7 +149,7 @@ contains
         implicit none
         type(mass_mbh_growth)::mmg
 
-        mmg%gas_reservior_add=sum(mmg%td_disc)+sum(mmg%stc_disc)+mmg%mass_loss_stellar_evolution
+        mmg%gas_reservior_add=sum(mmg%td_disc)+ mmg%mass_loss_stellar_evolution
         mmg%gas_reservior_add_acum=mmg%gas_reservior_add_acum+mmg%gas_reservior_add
         mmg%mass_direct_swallow=sum(mmg%lc_direct)+sum(mmg%td_direct)+sum(mmg%emax_direct)+sum(mmg%emri)
         mmg%mass_direct_swallow_acum=mmg%mass_direct_swallow_acum+ mmg%mass_direct_swallow
@@ -199,11 +185,7 @@ contains
         call add_attr_dble_arr(group_id,attr_id,"td_disc", &
             mmg%td_disc, n_tot_comp_sg)
         call add_attr_dble_arr(group_id,attr_id,"td_disc_acum", &
-            mmg%td_disc_acum, n_tot_comp_sg)
-        call add_attr_dble_arr(group_id,attr_id,"stc_disc", &
-            mmg%stc_disc, n_tot_comp_sg)
-        call add_attr_dble_arr(group_id,attr_id,"stc_disc_acum", &
-            mmg%stc_disc_acum, n_tot_comp_sg)
+            mmg%td_disc_acum, n_tot_comp_sg) 
         
     end subroutine
     subroutine mmg_add_base_event_stype(mmg,sp,mass)
@@ -242,9 +224,7 @@ contains
         mbh_mmg%lc_direct_acum(1:n_tot_comp_sg),&
         mbh_mmg%td_direct_acum(1:n_tot_comp_sg),&
         mbh_mmg%td_disc(1:n_tot_comp_sg),&
-        mbh_mmg%td_disc_acum(1:n_tot_comp_sg),&
-        mbh_mmg%stc_disc(1:n_tot_comp_sg),&
-        mbh_mmg%stc_disc_acum(1:n_tot_comp_sg),&
+        mbh_mmg%td_disc_acum(1:n_tot_comp_sg),& 
         mbh_mmg%emri(1:n_tot_comp_sg),&
         mbh_mmg%emri_acum(1:n_tot_comp_sg),&
         mbh_mmg%mass_loss_stellar_evolution,&
@@ -269,9 +249,7 @@ contains
         mbh_mmg%lc_direct_acum(1:n_tot_comp_sg),&
         mbh_mmg%td_direct_acum(1:n_tot_comp_sg),&
         mbh_mmg%td_disc(1:n_tot_comp_sg),&
-        mbh_mmg%td_disc_acum(1:n_tot_comp_sg),&
-        mbh_mmg%stc_disc(1:n_tot_comp_sg),&
-        mbh_mmg%stc_disc_acum(1:n_tot_comp_sg),&
+        mbh_mmg%td_disc_acum(1:n_tot_comp_sg),& 
         mbh_mmg%emri(1:n_tot_comp_sg),&
         mbh_mmg%emri_acum(1:n_tot_comp_sg),&
         mbh_mmg%mass_loss_stellar_evolution,&

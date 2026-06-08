@@ -8,9 +8,7 @@ module md_chain_pointer
         type(chain_pointer_type),pointer:: Next =>null()
 		type(chain_pointer_type),pointer:: Prev=>null()
 		type(chain_pointer_type),pointer:: Ed=>null()
-		type(chain_pointer_type),pointer:: Bg=>null()
-		type(chain_pointer_type),pointer:: Append_left=>null()
-		type(chain_pointer_type),pointer:: Append_right=>null()
+		type(chain_pointer_type),pointer:: Bg=>null() 
 !	    integer flag_chain
     contains
         procedure::set_head=>set_item_chain_head_chain_type
@@ -20,8 +18,7 @@ module md_chain_pointer
         procedure::arr_to_chain=>arr_to_chain_chain_type
 		procedure::create_ob=>chain_create_ob_chain_type
 		procedure::copy_to=>copy_chain_object_chain_type
-		procedure::print_node=>print_node_chain_chain_type
-        procedure::attach=>attach_merge_sample_chain_type
+		procedure::print_node=>print_node_chain_chain_type 
         procedure::attach_chain=>attach_chain_chain_type
         procedure::create_chain=>create_chain_chain_type
         procedure::get_sizeof=>get_sizeof_chain_chain_type
@@ -34,31 +31,19 @@ module md_chain_pointer
 	private::chain_create_ob_chain_type,copy_chain_object_chain_type,&
          print_node_chain_chain_type, set_item_chain_end_chain_type
     private::chain_to_arr_chain_type_single, arr_to_chain_chain_type
-    private::attach_merge_sample_chain_type, attach_chain_chain_type
+    private:: attach_chain_chain_type
     private::get_sizeof_chain_chain_type,create_chain_chain_type
 contains
 	subroutine print_node_chain_chain_type(chain, str_)
 		implicit none
 		class(chain_pointer_type)::chain
 		character*(*) str_
-		print*, str_
-		write(*,fmt="(A20, 2L5)") "append=", associated(chain%Append_left),associated(chain%Append_right)
+		print*, str_ 
         select type (ca=>chain%ob)
             class is (particle_sample_type)
                 call ca%print(str_)
         end select 
-		if(associated(chain%Append_left))then
-            select type(ca=>chain%Append_left%ob)
-                class is (particle_sample_type)
-                    call ca%print(trim(adjustl(str_))//"_left")
-            end select
-		end if
-		if(associated(chain%Append_right))then
-            select type(ca=>chain%Append_right%ob)
-                class is(particle_sample_type)
-                    call ca%print(trim(adjustl(str_))//"_right")
-            end select
-		end if
+		 
 	end subroutine
     subroutine create_chain_chain_type(item,length) 
         class(chain_pointer_type),target::item
@@ -78,8 +63,7 @@ contains
                 p=>pc%next
                 p%prev=>pc
                 p%bg=>pc%bg
-				p%Append_left=>Null()
-				p%Append_right=>Null()
+				 
                 p%idx=pc%idx+1
                 pc=>pc%next
             end do    
@@ -92,8 +76,7 @@ contains
                 item%next=>p
                 p%prev=>item
                 p%next=>pn
-				p%Append_left=>Null()
-				p%Append_right=>Null()
+				 
                 p%ed=>item%ed
                 p%bg=>item%bg
                 nullify(p)
@@ -182,15 +165,7 @@ contains
 		!type(chain_particle_pointer_type),pointer:: left,right
 		ps=>item
 		!print*, "associated(left)?",associated(item%Append_left)
-		if(associated(item%Append_left))then
-			!print*, "left"
-			call destroy_attach_pointer_chain_type(item%Append_left)
-		end if
-		!print*, "associated(right)?",associated(item%Append_right)
-		if(associated(item%Append_right))then
-			!print*, "right"
-			call destroy_attach_pointer_chain_type(item%Append_right)
-		end if
+		 
 		if(allocated(item%ob))then
 			deallocate(item%ob)
 		end if
@@ -205,14 +180,7 @@ contains
 		class(chain_pointer_type)::item
 		type(chain_pointer_type):: cp
 		
-		if(associated(item%append_left))then
-			allocate(cp%append_left)
-			call copy_chain_object_chain_type(item%append_left, cp%append_left)
-		end if
-		if(associated(item%append_right))then
-			allocate(cp%append_right)
-			call copy_chain_object_chain_type(item%append_right, cp%append_right)
-		end if
+		 
         if(.not.allocated(item%ob)) then
             print*, "error! item%ob not allocated"
             stop
@@ -242,33 +210,9 @@ contains
 	!if(sp%ob%N_gene.ge.2)then
 	!	print*, "save_attach_points:sp%ob%N_gene", sp%ob%N_gene
 		!call sp%print_node("save_attach_points")
-	!end if
-	if(associated(sp%append_left))then
-        select type(ca=>sp%Append_left%ob)
-        class is(particle_sample_type)
-            print*, "left:N_gene=",ca%N_gene
-            write(fileunit) flag_left
-            call save_attach_points(sp%Append_left,fileunit,version_number)
-        end select
-	else
-		!print*, "left:",flag_none
-		write(fileunit) flag_none
-	end if
-	if(associated(sp%append_right))then
-        select type (ca=>sp%Append_right%ob)
-        class is(particle_sample_type)
-            print*, "right:N_gene=",ca%N_gene
-            write(fileunit) flag_right
-            call save_attach_points(sp%Append_right,fileunit,version_number)
-        end select
-	else
-		!print*, "right:",flag_none
-		write(fileunit) flag_none
-	end if
-	write(fileunit) flag_write
+	!end if 
     select type(ca=>sp%ob)
-    type is(particle_sample_type)
-        write(fileunit) flag_particle
+    type is(particle_sample_type) 
 	    call ca%write_info(fileunit,version_number)
     end select
 	!print*, "write, sizeof=", flag_write, sizeof(sp%ob%track), allocated(sp%ob%track)
@@ -282,42 +226,15 @@ recursive subroutine read_attach_points(sp,fileunit,version_number)
 	integer flag
 	integer,parameter::flag_left=0,flag_right=1, flag_write=2,flag_none=-1
     integer,parameter::flag_particle=3 
-
-	read(fileunit) flag
-	!print*, "flag=",flag
-
-	if(flag.eq.flag_left)then
-		if(.not.associated(sp%append_left))then
-			allocate(sp%append_left)
-		end if
-		call read_attach_points(sp%Append_left,fileunit,version_number)
+  
+	 
+	if(.not.allocated(sp%ob)) then
+		allocate(particle_sample_type::sp%ob)
 	end if
-
-	read(fileunit) flag
-	!print*, "flag=",flag
-	if(flag.eq.flag_right)then
-		if(.not.associated(sp%Append_right))then
-			allocate(sp%append_right)
-		end if
-		call read_attach_points(sp%Append_right,fileunit,version_number)
-	end if
-	
-	read(fileunit) flag
-	!print*, "flag=",flag
-	if(flag.eq.flag_write)then
-        read(fileunit) flag
-        select case(flag)
-        case(flag_particle)
-            if(.not.allocated(sp%ob)) then
-                allocate(particle_sample_type::sp%ob)
-            end if
-            select type (ca=>sp%ob)
-            type is (particle_sample_type)
-                call ca%read_info(fileunit,version_number) 
-            end select
-        end select
-		!stop
-	end if
+	select type (ca=>sp%ob)
+	type is (particle_sample_type)
+		call ca%read_info(fileunit,version_number) 
+	end select 
 	
 end subroutine
 
@@ -360,32 +277,9 @@ end subroutine
 		pt%prev=>Null()	
 		pt%bg=>Null()
 		pt%ed=>Null()
-		
-		select case(flag)
-		case(1)
-			item%Append_left=>pt
-		case(2)
-			item%Append_right=>pt
-		end select		
+		 
 	end subroutine
-	subroutine attach_pointer_a_new_item(item, pt, flag)
-		implicit none
-		type(chain_pointer_type)::item
-		type(chain_pointer_type),target:: pt
-		integer flag
-
-		pt%next=>Null()
-		pt%prev=>Null()	
-		pt%bg=>Null()
-		pt%ed=>Null()
-		
-		select case(flag)
-		case(1)
-			item%Append_left=>pt
-		case(2)
-			item%Append_right=>pt
-		end select		
-	end subroutine
+	 
 	subroutine chain_pointer_delete_item_chain_type(item)
 		implicit none
 		type(chain_pointer_type),target:: item
@@ -574,27 +468,6 @@ end subroutine
         call cend%set_end()
         
 		!print*, "7"
-    end subroutine
-    subroutine attach_merge_sample_chain_type(ps,pt1,pt2, sample)
-		implicit none
-		class(chain_pointer_type)::ps
-        type(chain_pointer_type)::pt1, pt2
-		type(particle_sample_type)::sample
-		!print*, 'bg:attach_merge_sample'
-		!call pt%bg%output()
-		
-		if(.not.allocated(ps%ob))then
-			allocate(particle_sample_type::ps%ob)
-		end if
-		!print*, "0.2"
-        select type (cb=>ps%ob)
-        type is(particle_sample_type)
-            cb=sample
-        end select
-		!print*, "1"
-		call attach_pointer_a_new_item(ps, pt2, 1)
-		call attach_pointer_a_new_item(ps, pt1, 2)
-		!print*, 'end:attach_merge_sample'
-	end subroutine
+    end subroutine 
 
 end module

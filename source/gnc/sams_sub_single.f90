@@ -1,14 +1,3 @@
-!subroutine sams_get_weight_single(sps,e0)
-!	use com_main_gw
-!	implicit none
-!	type(particle_samples_arr_type)::sps
-!	real(8) e0
-!	integer i
-!	do i=1, sps%n
-!		call particle_sample_get_weight(sps%sp(i), e0)
-!	end do
-!	!print*, "3"
-!end subroutine
  
 subroutine update_jm(dm,spp,ex,jph_dmless, jm, jc_xy)
     use com_main_gw
@@ -187,14 +176,7 @@ subroutine get_kpl_ae(jm, jc, mbh, rp, ac,ec)
     real(8) jm, jc, mbh, rp, ac, ec
     ec=(jm*jc)**2/mbh/rp-1
     ac=rp/(1-ec)
-end subroutine
-!subroutine sams_get_weight_real_one(sp)
-!    use com_main_gw
-!    implicit none
-!    type(particle_sample_type)::sp
-!    call sams_get_weight_clone_single_one(sp)
-!    call get_sample_weight_real(sp)
-!end subroutine
+end subroutine 
 subroutine sams_get_weight_clone_single_one(sp)
     use com_main_gw
 	implicit none
@@ -207,10 +189,7 @@ subroutine sams_get_weight_clone_single_one(sp)
     call get_mass_idx(sp%m, mass_idx)
     amplifier=ctl%clone_factor(mass_idx)
 	  
-    if(sp%exit_flag.eq.exit_boundary_max)then
-        !print*, "sp%x,bx=",sp%x, sp%en/ctl%energy0, sp%byot_bf%e/ctl%energy0,sp%jm, sp%rp, sp%r_lc, &
-        !    sp%byot%e_bin,sp%byot_bf%l
-        !read(*,*)
+    if(sp%exit_flag.eq.exit_boundary_max)then 
         en=sp%byot_bf%e
         
     else
@@ -239,39 +218,7 @@ subroutine sams_get_weight_clone_single(sps)
 	do i=1, sps%n
         call sams_get_weight_clone_single_one(sps%sp(i))
 	end do
-end subroutine
-!subroutine get_wsi(spin, inc_in, wsi)
-!	use model_basic
-!	implicit none
-!	real(8) spin, inc_in,inc, wsi
-!	integer isel,i
-!	if(inc_in>pi) then
-!		inc=2*pi-inc_in
-!	else
-!		inc=inc_in
-!	end if
-!
-!	if(inc<spin_data_0999(1)) then
-!		isel=1
-!		goto 100
-!	end if
-!	if(inc>spin_data_0999(11)) then
-!		isel=11
-!		goto 100
-!	end if
-!
-!loop1: do i=1, 10
-!		if(inc>=spin_data_0999(i).and.inc<=spin_data_0999(i+1))then
-!			isel=i
-!			exit loop1
-!		end if
-!	   end do loop1
-!100	wsi=wsi_data_0999(isel)
-!	!print*, "inc_in, inc, isel, wsi=",inc_in,inc,isel, wsi
-!	!read(*,*)
-!	return
-!end subroutine
- 
+end subroutine 
 subroutine set_clone_weight(sms)
 	use com_main_gw
 	implicit none
@@ -449,9 +396,7 @@ subroutine deallocate_chains_arrs()
     implicit none
     integer i,j
     !print*, "1"
-    call bksams%destory()
-    !print*, "2"
-    call bysams%destory()
+    call bksams%destory() 
     !print*, "3"
     if(allocated(bksams_arr%sp))deallocate(bksams_arr%sp) 
     if(allocated(bksams_arr_norm%sp))deallocate(bksams_arr_norm%sp)
