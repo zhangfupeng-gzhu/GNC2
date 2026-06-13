@@ -208,8 +208,7 @@ contains
                 time_dt_nr=min(time_dt_e, time_dt_j)
                 sample_step_nr_e=time_dt_e/period
                 sample_step_nr_j=time_dt_j/period
-            case(dejmodel_xj)
-                call get_steps_nr_xj(sample%en, sample%jm, coenr,  time_dt_nr)
+             
             case default
                 print*, "error! define dejmodel", ctl%dejmodel
                 stop
@@ -511,14 +510,7 @@ contains
 			Enf=Eni+den
 			jf=Ji+djp
 
-		case(dejmodel_xj)
-			Eni=sample%en/ctl%energy0
-			Enf=(Eni+den)*ctl%energy0
-			Ji=sample%jm
-			Jf=ji+djp
-			af=-spp_new%mbh/(2*Enf)
-			!jmf=jf
-		
+		 
 			
 		case default
 			print*, "error! define dejmodel", ctl%dejmodel

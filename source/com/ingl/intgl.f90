@@ -116,7 +116,7 @@ contains
 			RTOL=rpar(100)
 			ATOL=rpar(99)
 		end if
-		ITOL=1;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=1;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		WORK(1)=1d-30;  
 		IWORK(3)=6;
 		if(present(hrlow_in))then
@@ -150,7 +150,7 @@ contains
 		integer n_y,ipar(100)
 		real(8) y,yout(1)
 		real(8) RTOL(1),ATOL(1),rpar(100)
-		integer,parameter::LWORK=400,LIWORK=400
+		integer,parameter::LWORK=400,LIWORK=150
 		real(8)	WORK(LWORK)
 		integer IWORK(LIWORK)
 		real(8) x_start,x_end,xs,xe
@@ -185,7 +185,7 @@ contains
 		integer n_y,ipar(100)
 		real(8) y,yout(1)
 		real(8) RTOL(1),ATOL(1),rpar(100)
-		integer,parameter::LWORK=400,LIWORK=400
+		integer,parameter::LWORK=400,LIWORK=150
 		real(8)	WORK(LWORK)
 		integer IWORK(LIWORK)
 		real(8) x_start,x_end,xs,xe
@@ -220,7 +220,7 @@ contains
 		real(8) hrlow,hrhigh
 		external::dopri5,FCN,my_solout_empty
 
-		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		!WORK(1)=1d-30;  
 		!IWORK(3)=6;   ! print messages
 		IWORK(1)=10000000;
@@ -255,7 +255,7 @@ contains
 			real(8) hrlow,hrhigh
 			external::dopri5,FCN,MY_SO_OUT
 	
-			ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+			ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 			!WORK(1)=1d-30;  
 			!IWORK(3)=6;   ! print messages
 			IWORK(1)=10000000;
@@ -290,7 +290,7 @@ contains
 				real(8) hrlow,hrhigh
 				external::dopri5,FCN,MY_SO_OUT
 		
-				ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+				ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 				!WORK(1)=1d-30;  
 				!IWORK(3)=6;   ! print messages
 				IWORK(1)=10000000;
@@ -370,7 +370,7 @@ contains
 		external::dopri5,FCN,my_solout_empty
 		RTOL=1d-12
 		ATOL=1d-12
-		ITOL=1;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=1;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		!WORK(1)=1d-30;  
 		IWORK(3)=6;
 		if(present(hrlow_in))then
@@ -413,7 +413,7 @@ contains
 		external::dopri5,my_solout_empty,spline_mylib,splint_mylib
 		RTOL=1d-12
 		ATOL=1d-12
-		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		!WORK(1)=1d-30;  
 		!IWORK(3)=6;
 		IWORK(1)=10000000;
@@ -457,7 +457,7 @@ contains
 		real(8) yp1,ypn
 		real(8),allocatable::y2(:)		
 		external::dopri5,my_solout_empty,spline_mylib,splint_mylib
-		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		!WORK(1)=1d-30;  
 		!IWORK(3)=6;
 		IWORK(1)=10000000;
@@ -504,7 +504,7 @@ contains
 		real(8) yp1,ypn
 		real(8),allocatable::y2(:)		
 		external::dopri5,my_solout_empty,spline_mylib,splint_mylib
-		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		!WORK(1)=1d-30;  
 		!IWORK(3)=6;
 		IWORK(1)=10000000;
@@ -549,7 +549,7 @@ contains
 		external::dopri5,my_solout_empty,spline_mylib,splint_mylib
 		RTOL=1d-12
 		ATOL=1d-12
-		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		!WORK(1)=1d-30;  
 		!IWORK(3)=6;
 		IWORK(1)=10000000;
@@ -608,7 +608,7 @@ contains
 		external::dopri5,my_solout_empty,spline_mylib,splint_mylib
 		RTOL=1d-12
 		ATOL=1d-12
-		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=400
+		ITOL=0;LWORK=400;WORK=0;IWORK=0;LIWORK=150
 		!WORK(1)=1d-30;  
 		!IWORK(3)=6;
 		IWORK(1)=10000000;

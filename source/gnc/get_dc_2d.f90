@@ -1482,24 +1482,7 @@ subroutine mb_get_dc_mpi_starpt_gx_iregular_2d(mb,spp)
 		mb%dc%s2_djj%fxy=jj*sigma32*n0*kappa
 		mb%dc%s2_dej%fxy=ej*sigma32*n0*kappa
 	
-	case(dejmodel_xj)
-		do i=1, n
-			do j=1, n
-				!call get_coeff_xj(cej,ycenter(j), &
-				!s0(i,j), s110(i,j), &
-				!s111(i,j),s131(i,j),s130(i,j),s13_1(i,j),s330(i,j),s310(i,j))
-
-				mb%dc%s2_de_110%fxy(i,j)=cej%e_110*sigma32*n0*kappa
-				mb%dc%s2_de_0%fxy(i,j)=cej%e_0 *sigma32*n0*kappa
-				if(cej%ee<0d0) cej%ee=abs(cej%ee)
-				mb%dc%s2_dee%fxy(i,j)=cej%ee*sigma32*n0*kappa
-				mb%dc%s2_dj_111%fxy(i,j)=cej%j_111 *sigma32*n0*kappa
-				mb%dc%s2_dj_rest%fxy(i,j)=cej%j_rest *sigma32*n0*kappa
-				if(cej%jj<0d0) cej%jj=abs(cej%jj)
-				mb%dc%s2_djj%fxy(i,j)=cej%jj*sigma32*n0*kappa
-				mb%dc%s2_dej%fxy(i,j)=cej%ej*sigma32*n0*kappa
-			end do
-		end do
+	 
 	
 	end select
 end subroutine

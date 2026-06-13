@@ -117,18 +117,7 @@ subroutine get_coenr(even, evjum, m, en, jc, coenr,idx,idy)
             sample_rlx_e_time=1d0/dee
             sample_rlx_j_time=10**(evjum*2)/djj
         end if
-    case(dejmodel_xj)
-        coeNr%jj=djj; 
-        coeNr%e=de_0; coeNr%j=dj_rest
-        do i=1, dms%n
-            coeNr%e=coeNr%e+m/dms%mb(i)%mc*de_110(i)
-            coeNr%j=coeNr%j+dj_111(i)*(m+dms%mb(i)%mc)/dms%mb(i)%mc/2d0; 
-        end do
-        coeNr%ee=dee*even*even;
-        !coeNr%ee=dee*(10**even*ctl%energy0)**2
-
-        coeNr%e=coeNr%e*even; 
-        coeNr%ej=  dej*even
+     
     case default
         print*, "error! define dejmodel", ctl%dejmodel
         stop

@@ -90,7 +90,7 @@ diffusion coefficient bin type =IREG
 diffusion coefficient integral method        =FAST
 
 ------------------------------------------------------------------
-####   Using bins of (E,J) or (x,j) 
+####   Using bins of (E,J)  
 
 energy and angular momentum in bins of = EJ
 

@@ -326,7 +326,7 @@ subroutine get_barp_one(logenx,fx,rmax,mbhin,spp)
     call my_integral_acc(logrmin,rmax_tmp,fout,1d-24,1d-14, FCN, idid) 
     fx=2**1.5d0*abs(fout)*log(10d0)
 contains 
-	subroutine FCN(N,X,Y,F,IPAR,RPAR)
+	subroutine FCN(N,X,Y,F,RPAR,IPAR)
 		implicit none
 		integer n, ipar(100)
 		real(8) x, y(n), f(n), rpar(100),ysp, phi_tmp, radius

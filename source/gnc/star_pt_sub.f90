@@ -1013,7 +1013,7 @@ subroutine get_bin_number()
 	!stop
 	
 contains 
-	subroutine FCN(N,X,Y,F,IPAR,RPAR)
+	subroutine FCN(N,X,Y,F,RPAR,IPAR)
 		implicit none
 		integer n, ipar(100)
 		real(8) x, y(n), f(n), rpar(100),ysp

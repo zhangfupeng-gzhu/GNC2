@@ -103,9 +103,7 @@ subroutine apply_paras()
 				read(unit=pvalue,fmt=*) ctl%str_dejmodel
 				select case (trim(adjustl(ctl%str_dejmodel)))
 				case ("EJ")
-					ctl%dejmodel=dejmodel_EJ
-				case ("xj")
-					ctl%dejmodel=dejmodel_xj
+					ctl%dejmodel=dejmodel_EJ 
 				case default
 					print*, "ERROR, define dejmodel:", trim(adjustl(ctl%str_dejmodel))
 					stop

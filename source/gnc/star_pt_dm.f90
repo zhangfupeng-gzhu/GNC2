@@ -51,7 +51,7 @@ subroutine get_fma_tot_one(xb,rmin,fx, spp)
 	call my_integral_acc(rmin,xb,yout,fr_funcs_int_acc_a,fr_funcs_int_acc_r,FCN, idid)
 	fx=yout*4*pi*log(10d0)+10**(rmin*3)/3d0*spp%spt_rho_rmin*4*pi 
 contains 
-	subroutine FCN(N,X,Y,F,IPAR,RPAR)
+	subroutine FCN(N,X,Y,F,RPAR,IPAR)
 		implicit none
 		integer n, ipar(100)
 		real(8) x, y(n), f(n), rpar(100),ysp, rho_out
@@ -106,7 +106,7 @@ subroutine get_spp_starpt_one(xb, fx, spp)
 	fx=fx*4*pi*log(10d0)+spp%spt_rho_rmin*10**(sample_logrmin*3)/3d0/radius*4*pi
 	!print*, "rmin,rmax=",rmin,rmax, fx
 contains 
-	subroutine FCN(N,X,Y,F,IPAR,RPAR)
+	subroutine FCN(N,X,Y,F,RPAR,IPAR) 
 		implicit none
 		integer n, ipar(100), j
 		real(8) x, y(n), f(n), rpar(100),ysp
@@ -175,7 +175,7 @@ subroutine get_spt_phi_constants(spp)
 	spp%phi_star0=spp%phi_r1r2_s+0.5d0*10**(rmin*2)*spp%spt_rho_rmin
 	!print*, "s2=",spp%phi_r1r2_s2 
 contains 
-	subroutine FCN(N,X,Y,F,IPAR,RPAR)
+	subroutine FCN(N,X,Y,F,RPAR,IPAR)
 		implicit none
 		integer n, ipar(100), j
 		real(8) x, y(n), f(n), rpar(100),ysp
@@ -183,7 +183,7 @@ contains
 		call get_rho_full_range_spp(spp,x,ysp)
 		F(1)=ysp* (10**X)**2
 	end subroutine
-	subroutine FCN2(N,X,Y,F,IPAR,RPAR)
+	subroutine FCN2(N,X,Y,F,RPAR,IPAR)
 		implicit none
 		integer n, ipar(100), j
 		real(8) x, y(n), f(n), rpar(100),ysp

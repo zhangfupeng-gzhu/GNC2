@@ -295,7 +295,7 @@ module model_basic
 	integer,parameter::boundary_fj_iso=1 
 	integer,parameter::ini_sample_mode_given=1, ini_sample_mode_mobse=2 
 	integer,parameter::ini_sample_mode_bse=3
-	integer,parameter::dejmodel_EJ=1, dejmodel_xj=2 
+	integer,parameter::dejmodel_EJ=1 
 	integer,parameter::task_mode_new=1, task_mode_append=2
 	integer,parameter::snap_mode_new=1, snap_mode_append=2, snap_mode_one=3   
      
