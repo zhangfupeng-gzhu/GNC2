@@ -16,7 +16,7 @@ lapacklib=$(LAPACKLIBDIR)
 lapackinc=$(LAPACKINCDIR) 
 use_mobse=1
 dir=$(FSHAREDIR)
-usestack=1
+usestack=0
 
 ifeq ($(USE),MPI)
 FC=mpif90
