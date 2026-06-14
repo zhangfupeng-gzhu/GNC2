@@ -16,6 +16,7 @@ lapacklib=$(LAPACKLIBDIR)
 lapackinc=$(LAPACKINCDIR) 
 use_mobse=1
 dir=$(FSHAREDIR)
+usestack=1
 
 ifeq ($(USE),MPI)
 FC=mpif90
@@ -38,6 +39,8 @@ endif
 ifeq ($(use_lapack),1)
 	FLAG+=-I$(lapackinc) -L$(lapacklib) -llapack 
 endif
+
+
 
 ifeq ($(use_mobse),1)
 	FLAG+=-L$(mobsedir) -I$(mobsedir) -lmobse  -DMOBSE
@@ -65,6 +68,10 @@ all: main ini  get_time_range event_analysis
 
 %: %.f90 $(libs) | check_libs 
 	$(FC) $< -o $@ $(FLAG)
+	@if [ $(usestack) -eq 1 ]; then \
+	    echo "Running: execstack -s $@"; \
+	    execstack -s $@ || echo "Warning: execstack -s $@ failed"; \
+	fi
 	
 check_libs:
 # 	@echo "Checking required libraries..."
