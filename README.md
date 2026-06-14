@@ -57,7 +57,7 @@ Replace:
 * ``$installed_gnc_source_path`` with the location of the source files you downloaded.
 * ``$installed_hdf5lib_path`` and ``$installed_hdf5inc_path`` with the library and include paths of HDF5, which can be obtained by running ``h5fc -show''.
 
-2. Change to the source directory and run ``make". Wait until compilation is complete. In Linux systems where stack memory execution is prohibited, you need to set ``usestack=1`` in ``main/makefile`` and install ``execstack`` to mark the program's stack as executable.
+2. Change to the source directory and run ``make``. Wait until compilation is complete. In Linux systems where stack memory execution is prohibited, you need to set ``usestack=1`` in ``main/makefile`` and install ``execstack`` to mark the program's stack as executable.
 
 3. *Start a new shell*, run the following commands in shell :
 ```shell
