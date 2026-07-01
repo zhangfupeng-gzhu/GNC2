@@ -240,7 +240,7 @@ subroutine run_one_sample_particle_inside_cluster(pt, time, total_time)
 								tidal_condition=.false.
 								select case(sample%obtype)
 									case(star_type_ms,star_type_rg,star_type_nakedHe, star_type_bd)
-										if(sample%rp>2*mbh_radius)then
+										if(sample%rp>2*mbh_radius )then
 											tidal_condition=.true.
 										end if
 									case default

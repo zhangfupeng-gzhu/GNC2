@@ -499,10 +499,7 @@ contains
 		real(8) den, djp,steps
 		real(8) ai,ei,Eni, Enf, Ji, Jf, af
 		real(8) jmf, mef
-
-		!sample%byot%a_bin=-mbh/(2*sample%en)
-		!ai=sample%byot%a_bin
-		!ei=sample%byot%e_bin		
+ 
 		select case(ctl%dejmodel)
 		case(dejmodel_EJ)
 			Eni=sample%en
@@ -530,21 +527,12 @@ contains
 	 end subroutine
      subroutine set_ebound_for_samples(sample)
         implicit none
-		class(particle_sample_type)::sample
-        !type(star_pot_para)::spp
+		class(particle_sample_type)::sample 
 
         ! the maximum energy can not be crossed, if there is no black hole in the center.
-        if(sample%en<ctl%energy_max)then
-            !print*, "sample%x,jm:i=", sample%en/ctl%energy0, sample%jm, sample%jph
-            !sample%en=sample%byot_bf%e
-            !sample%en=2*ctl%energy_max-sample%en
-            !print*, "sample%en,emax=",sample%en,ctl%energy_max
+        if(sample%en<ctl%energy_max)then 
             sample%en=ctl%energy_max*0.9999999
-            running_correction_emax=running_correction_emax+1
-            !call get_ex_idx(sample%en/ctl%energy0, idx,even)
-            !sample%jph=sample%jm*dms%jc%fx(idx)*ctl%v0*r0_cl
-            !print*, "sample%x,jm:f=", sample%en/ctl%energy0, sample%jm, sample%jph
-            !read(*,*)
+            running_correction_emax=running_correction_emax+1 
         end if
      end subroutine
 	 
@@ -560,9 +548,8 @@ subroutine set_star_spin_random(pr)
     real(8) pd
     select case(pr%obtype)
     case(star_type_ms)
-        theta=rnd(0d0,pi)
-        phi=rnd(0d0,2*pi)
-        ! assuming rotation period of 30 days
+        theta=acos(rnd(-1d0,1d0))
+        phi=rnd(0d0,2*pi) 
         pd=30d0/(365.2425/2d0/pi)
         pr%spin=(/cos(theta)*sin(phi), cos(theta)*cos(phi), sin(theta)/)*2*pi/pd
     case default

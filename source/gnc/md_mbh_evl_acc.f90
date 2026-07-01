@@ -126,7 +126,7 @@ contains
     subroutine init_mass_mbh_growth_in_one_snap(mmg)
         implicit none
         class(mass_mbh_growth)::mmg
-        mmg%lc_direct=0; mmg%td_direct=0; mmg%td_direct=0;  
+        mmg%lc_direct=0; mmg%td_direct=0; mmg%td_disc=0;  
         mmg%emri=0; mmg%emax_direct=0; 
         mmg%gas_reservior_add=0
         mmg%mass_direct_swallow=0

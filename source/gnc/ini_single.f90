@@ -69,28 +69,12 @@ contains
 			do i=2, ctl%ini_nx_tot%nbin
 				if(ctl%ini_nper_bin(midx)%fx(i)<0.5)then
 					cx_tmp(i)=cx_tmp(i-1)+fx_tmp(i)
-				else
-					! max_lvl=get_clone_deep(10**ctl%ini_nx_tot%xb(i),log_clone_bd_sep,  clone_e0_factor)
+				else 
 					cx_tmp(i)=cx_tmp(i-1)+fx_tmp(i)
-				end if
-				!print*, "xb,fx=",ctl%ini_nx_tot%xb(i), fx_tmp(i)
+				end if 
 			end do
 			cx_tmp=cx_tmp/cx_tmp(ctl%ini_nx_tot%nbin)
-		end if
-		! do i=1, ctl%ini_nx_tot%nbin
-		! 	print*,"i,x,y=",i, 10**ctl%ini_nx_tot%xb(i), cx_tmp(i)
-		! end do
-		!call ctl%ini_nx_tot%print("ini_nx_tot")
-		!if(rid.eq.0 )then
-		!	call ctl%ini_nx_tot%print("ini_nx")
-		!	do i=1, ctl%ini_nx_tot%nbin			
-		!		print*, "xb,fx_tmp=",ctl%ini_nx_tot%xb(i), fx_tmp(i), ctl%ini_nper_bin(midx)%fx(i)
-		!	end do
-		!	read(*,*)
-		!end if
-		!print*, "midx=",midx
-		!print*, fx_tmp
-		!read(*,*)
+		end if 
 	end subroutine
 end module
 
@@ -207,23 +191,13 @@ subroutine set_chain_samples_single(cbk, bksps_arr)
         type is(particle_sample_type)
             ca=bksps_arr%sp(i)
             ca%create_time=0d0
-            ca%simu_bgtime=0d0
-            !if(ctl%clone_scheme.ge.1)then
-            !    ca%nhiar=get_lvl(ca%en)
-            !else
-            !    ca%nhiar=0
-            !end if
+            ca%simu_bgtime=0d0 
             ca%en0=ca%en
             ca%jm0=ca%jm
 			if(ca%jm0<jmin_value)then
 				print*, "jm0=",ca%jm0, "<=jmin_value=",jmin_value
 				stop
-			end if
-			!print*,"jm, ebin=", ca%jm, ca%byot%e_bin
-            !if(ctl%clone_scheme.ge.1)then
-            !    !print*, "clone"
-            !    call create_init_clone_particle(ptbk, ca%en0,0d0)
-            !end if
+			end if 
 		end select
         ptbk=>ptbk%next
 	end do
@@ -316,9 +290,7 @@ subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
 	!call get_mass_idx(bkps%m,midx)
 	
 	if(ctl%clone_scheme.ge.1)then
-		
-		! ini_ex=gen_ran_from_dstr_consider_clone_cum(ctl%ini_nx_tot%xb,cx_tmp, &
-		! 	ctl%ini_nx_tot%nbin, ctl%ini_nx_tot%xmin,ctl%ini_nx_tot%xmax)
+		 
 		ini_ex=gen_ran_from_dstr_consider_clone(ctl%ini_nx_tot%xb,fx_tmp, &
 			ctl%ini_nx_tot%y2, ctl%ini_nx_tot%nbin, ctl%ini_nx_tot%xmin,ctl%ini_nx_tot%xmax,&
 		fmax, clone_e0_factor, clone_amplifier,  2)
@@ -336,8 +308,7 @@ subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
 		call get_rmax_accurate(spp_new,  dms%fr_phi, ini_ex,rmax)
 	 
 	end select
-	rc=r_c_iter(spp_new,bkps%x,ier)
-	!if(rc)
+	rc=r_c_iter(spp_new,bkps%x,ier) 
 	jc_xy=jc_dmless(rc,spp_new)
 	bkps%jc=jc_xy*(r0_cl*ctl%v0)
 	
@@ -350,15 +321,12 @@ subroutine init_particle_sample_one_model_rnd(bkps, midx, ini_sample_sg_mode)
     pd_xy=p_EJ_dmless_fast(spp_new, bkps%x,bkps%jm,  jc_xy, rp_xy,ra_xy)
     bkps%period=pd_xy*r0_cl/ctl%v0
 
-	bkps%jph=bkps%jm*bkps%jc
-	!print*, "bkps%byot%ms%radius=",bkps%byot%ms%radius
+	bkps%jph=bkps%jm*bkps%jc 
 	call init_particle_sample_common(bkps)
-	if(ctl%include_loss_cone.ge.1)then
-		!print*, "bkps%byot%ms%radius=",bkps%byot%ms%radius
+	if(ctl%include_loss_cone.ge.1)then 
 		call get_sample_r_td(bkps)
 		call get_sample_jlc(bkps%x,spp_new%mbh_dmless,bkps%r_lc/r0_cl,bkps%jc/(ctl%v0*r0_cl),spp_new,sample_jlc_dimless,ier)
-		if(ier>0.or.ra_xy<bkps%r_lc/r0_cl)then
-			! print*, "type, sample_jlc_dimless,x,rmax=",midx,sample_jlc_dimless,bkps%jm,bkps%x, ra_xy, bkps%r_lc/r0_cl!, 10**rmax
+		if(ier>0.or.ra_xy<bkps%r_lc/r0_cl)then 
 			if(ra_xy<bkps%r_lc/r0_cl)then 
 				goto 100
 			else
@@ -385,16 +353,10 @@ subroutine get_one_kroupa_sample(sp,m1,m2,tstart)
 	sp%m=m
 	kstar=get_kstar_integer("MS")
 	 
-	call sp%sh%get_history(kstar,m,ctl%metal_z,12000d0,tstart,0)
-	! if(sp%m>40)then
-	 	! call sp%sh%print()
-	if(sp%sh%n>8)then
-	! 	call sp%sh%print()
-		call simplfy_history(sp%sh)
-	! 	call sp%sh%print()
-	end if
-	 	! call sp%sh%print()
-	 	! read(*,*) 
+	call sp%sh%get_history(kstar,m,ctl%metal_z,12000d0,tstart,0) 
+	if(sp%sh%n>8)then 
+		call simplfy_history(sp%sh) 
+	end if 
 
 	call get_current_particle_stellar_info(sp,0d0,flag,.false.)
  
@@ -492,11 +454,7 @@ subroutine get_one_topheavy_sample(sp,m1,m2,tstart)
 	 
 
 	call get_current_particle_stellar_info(sp,0d0,flag,.false.)
-
-	!print*, sp%sh%cur_idx
-	!call sp%sh%print()
-	!print*, "m1,m2,m,sp%m,radius=",m1,m2,m,sp%m,sp%byot%ms%radius
-	!read(*,*)
+ 
 end subroutine
 
 subroutine get_jm_idx(jm, idx, rdx,evjum)
@@ -504,22 +462,14 @@ subroutine get_jm_idx(jm, idx, rdx,evjum)
 	use md_coeff
 	implicit none
 	real(8) jm, evjum,jmin,  jmax,rdx
-	integer idx
-	!print*, "jm, jmin_value, jmax_value=", jm, jmin_value, jmax_value
-	!print*, "in:jm=", jm
+	integer idx 
 	if(jm<jmin_value)then
-		jm=2*jmin_value-jm
-		!evjum=jmin_value
+		jm=2*jmin_value-jm 
 	end if
 
 	if(jm>jmax_value)then
-		jm=jmax_value
-		!evjum=jmax_value
-	end if
-	!		
-	!jm=evjum
-	!call dms%alpha_r%print("alpha_r")
-	!stop
+		jm=jmax_value 
+	end if 
 
 	select case(ctl%jbin_type) 
 	case(jbin_type_log) 
@@ -559,8 +509,7 @@ subroutine get_ex_idx_ir(ex,idx,rdx, even)
 	end if
 	if(even<log10emin_factor)then
 		even=log10emin_factor
-	end if
-	!sample%x=even
+	end if 
 
 	call return_idx_ir(dms%dc0%s2_dee%xcenter,dms%df_coe_bins,even, idx,sts_type_dstr)
 		 
@@ -600,10 +549,8 @@ subroutine get_ex_idx(ex,idx,rdx,even)
 	end if
 	if(even<smin)then
 		even=smin
-	end if
-	!sample%x=even
-	call return_idx(even, smin, smax,dms%df_coe_bins, idx,coeff_sts_type_dc)
-	!print*, "ex, even, emin,emax=", ex, even, dms%logemin, dms%logemax,log10emax_factor,log10emin_factor
+	end if 
+	call return_idx(even, smin, smax,dms%df_coe_bins, idx,coeff_sts_type_dc) 
 	if(idx<-1)then
 		idx=1
 		print*, "even, ex=",even, ex
@@ -625,8 +572,7 @@ subroutine init_particle_sample_common(bkps)
 	use com_main_gw
 	implicit none
 	type(particle_sample_type)::bkps
-	real(8),external:: rnd, gen_ran_from_data
-	!type(core_comp_type)::cc
+	real(8),external:: rnd, gen_ran_from_data 
 
 	call set_star_spin_random(bkps%byot%ms) 
 	!end if
@@ -642,10 +588,8 @@ subroutine init_particle_sample_common(bkps)
 	bkps%byot_ini=bkps%byot
 	bkps%exit_flag=exit_normal
 	bkps%rid=rid
-    bkps%source=source_bk
-	!bkps%weight_n=1
-	bkps%N_gene=1
-	!print*, "2"
+    bkps%source=source_bk 
+	bkps%N_gene=1 
 	call set_particle_sample_other(bkps)
 	
 end subroutine
@@ -654,12 +598,9 @@ subroutine set_particle_sample_other(bkps)
 	implicit none
 	type(particle_sample_type)::bkps
 	real(8) rnd, period
-	
-!	print*, "sp%byin%a_bin=",sp%byin%a_bin,sp%byin%e_bin, sp%byin%a_bin, sp%byin%e_bin
-!	read(*,*)
-
+	 
 	bkps%byot%ms%m=bkps%m; bkps%byot%mm%m=spp_new%mbh; bkps%byot%mtot=bkps%m+spp_new%mbh
-	bkps%byot%Inc=rnd(0d0,pi); bkps%byot%Om=rnd(0d0,2*pi); 
+	bkps%byot%Inc=acos(rnd(-1d0,1d0)); bkps%byot%Om=rnd(0d0,2*pi); 
     bkps%byot%pe=rnd(0d0, 2*pi); 
 	bkps%byot%bname='byot'
 	bkps%byot_bf%bname='byot_bf'
@@ -699,13 +640,9 @@ subroutine init_output()
 		print*, "TNR0=",ctl%trlx_rh0
 	end if
 	 
-	if(rid.eq.0)then
-		!print*, "??"		
-		! print*, "1"
-		call output_dms_hdf5_pdf(dms, "./output/ini/hdf5/dms_0")
-		! print*, "2"
-		call output_ctl_ini_dstr_hdf5("./output/ini/hdf5/ini")
-!		call output_dms_aux_data_hdf5(dms,"./output/ini/hdf5/aux")
+	if(rid.eq.0)then 
+		call output_dms_hdf5_pdf(dms, "./output/ini/hdf5/dms_0") 
+		call output_ctl_ini_dstr_hdf5("./output/ini/hdf5/ini") 
 
 		call output_diffuse_mspec_bin("output/ini/hdf5/dms_0")
 		write(*,*) "init finished"	 
