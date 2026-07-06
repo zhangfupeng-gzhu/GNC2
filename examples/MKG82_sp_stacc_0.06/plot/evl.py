@@ -171,10 +171,8 @@ nl=int(np.loadtxt(fdir+"/output/run_summary.txt"))
 #nl=200
 plot_one_t_mbh(sr,epsilon=0.1) 
 ax.set_xlabel("log $t$ (Gyr)",fontsize=labelfontsize)
-ax.set_ylabel(ylabel,fontsize=labelfontsize)
-if(j==1):
-	# legend_para={"handlelength":1.5}
-	ax.legend(loc='lower left',ncol=3,fontsize=4,handlelength=3.2)
+ax.set_ylabel(ylabel,fontsize=labelfontsize) 
+ax.legend(loc='lower left',ncol=3,fontsize=4,handlelength=3.2)
 
 j=j+1
 ax=plt.subplot(sx,sy,j)
@@ -182,6 +180,7 @@ plot_one_t_rate(sr,nmv=nmvs)
 ax.set_xlabel("log $t$ (Gyr)",fontsize=labelfontsize)
 ax.set_ylabel("log Rate (yr$^{-1}$)",fontsize=labelfontsize) 
 myaxisfmt.set_yaxis(ymajorstep=1.0)
+ax.legend(loc='lower left',ncol=3,fontsize=4,handlelength=3.2)
 
 plt.tight_layout() 
 plt.savefig("fig_mbh_evl_dehnen.pdf")
