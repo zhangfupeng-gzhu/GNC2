@@ -331,19 +331,19 @@ def get_one_rates(fdir,nl,print_err=True):
     objs=["star", "sbh", "ns", "wd", "bd", "rg"]
     for i in range(nl):
         fl=fdir+"./output/ecev/dms/dms_"+str(i+1)+".hdf5"
-        sr.dt[i]=myhdf5_funcs.read_attr_hdf5(fl,".","dT(Myr)")/1e3
-        sr.t[i]=myhdf5_funcs.read_attr_hdf5(fl,".","Time(Myr)")/1e3
-        sr.tnr[i]=myhdf5_funcs.read_attr_hdf5(fl,".", "Trlx_rh(Myr)")/1e3
+        sr.dt[i]=myhdf5_funcs.read_attr_hdf5(fl,".","dT(Myr)")[0]/1e3
+        sr.t[i]=myhdf5_funcs.read_attr_hdf5(fl,".","Time(Myr)")[0]/1e3
+        sr.tnr[i]=myhdf5_funcs.read_attr_hdf5(fl,".", "Trlx_rh(Myr)")[0]/1e3
         sr.logt[i]=np.log10(sr.t[i])
-        sr.reff[i]=myhdf5_funcs.read_attr_hdf5(fl, ".", "reff(pc)")
-        sr.mbh[i]=myhdf5_funcs.read_attr_hdf5(fl,".","MBH")
+        sr.reff[i]=myhdf5_funcs.read_attr_hdf5(fl, ".", "reff(pc)")[0]
+        sr.mbh[i]=myhdf5_funcs.read_attr_hdf5(fl,".","MBH")[0]
         sr.logmbh[i]=np.log10(sr.mbh[i])
-        sr.gas_res[i]=myhdf5_funcs.read_attr_hdf5(fl,"dMbh","gas_reservior_left",print_err=print_err)
+        sr.gas_res[i]=myhdf5_funcs.read_attr_hdf5(fl,"dMbh","gas_reservior_left",print_err=print_err)[0]
         sr.gas_res[sr.gas_res==0]=1e-5
-        sr.mcl[i]=myhdf5_funcs.read_attr_hdf5(fl,".","Mcluster(Msun)")
-        sr.rh[i]=myhdf5_funcs.read_attr_hdf5(fl,".","rh(pc)")
-        sr.mass_loss[i]=myhdf5_funcs.read_attr_hdf5(fl,"dMbh","mass_loss_stellar_evolution_acum",print_err=print_err)
-        sr.direct_swallow[i]=myhdf5_funcs.read_attr_hdf5(fl,"dMbh","mass_direct_swallow_acum",print_err=print_err)
+        sr.mcl[i]=myhdf5_funcs.read_attr_hdf5(fl,".","Mcluster(Msun)")[0]
+        sr.rh[i]=myhdf5_funcs.read_attr_hdf5(fl,".","rh(pc)")[0]
+        sr.mass_loss[i]=myhdf5_funcs.read_attr_hdf5(fl,"dMbh","mass_loss_stellar_evolution_acum",print_err=print_err)[0]
+        sr.direct_swallow[i]=myhdf5_funcs.read_attr_hdf5(fl,"dMbh","mass_direct_swallow_acum",print_err=print_err)[0]
         sr.td_accum[i]=np.sum(myhdf5_funcs.read_attr_hdf5(fl, "dMbh","td_disc_acum",print_err=print_err))
         sr.emri_accum[i]=np.sum(myhdf5_funcs.read_attr_hdf5(fl, "dMbh","emri_acum",print_err=print_err))
         sr.emax_accum[i]=np.sum(myhdf5_funcs.read_attr_hdf5(fl, "dMbh","emax_direct_acum",print_err=print_err))

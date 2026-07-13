@@ -7,7 +7,6 @@ from matplotlib import ticker,cm,colors
 import myaxisfmt 
 import h5py 
 import myplt_funcs 
-from scipy.interpolate import splrep, BSpline
 import pandas as pd
 import gwcom
 
