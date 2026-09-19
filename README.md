@@ -167,6 +167,7 @@ gamma=1.0
 ```
 
 **Setting `particle_weighting_factor`**
+
 When particle cloning is ignored, ``particle_weighting_factor`` is the real number of stellar objects represented by each simulation particle. In ``GNC``, simulations should typically use the cloning scheme by setting ``clone_scheme=1`` in ``model.in``. In such cases, the weight of a particle can be further split to a number of ``clone_factor`` clone particles, depending on its energy. Thus, `particle_weighting_factor` and `clone_factor` together determine the total number of Monte-Carlo particles initially generated for a given mass bin. The larger `particle_weighting_factor`, the fewer particles in the simulation, because each particle now represents more real objects.
 
 Note that ``particle_weighting_factor`` values across different mass bins must all be integer multiples of the smallest ``particle_weighting_factor`` among them.
